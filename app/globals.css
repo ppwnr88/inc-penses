@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Noto Sans Thai', system-ui, -apple-system, sans-serif;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-cream-50 text-gray-900 antialiased;
+    font-family: var(--font-sans);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer utilities {
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-pt {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .page-container {
+    @apply max-w-lg mx-auto px-4 pb-24;
+  }
+
+  .section-title {
+    @apply text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 mb-2;
+  }
+
+  .gradient-brand {
+    background: linear-gradient(135deg, #84a06e 0%, #526843 100%);
+  }
+
+  .gradient-cream {
+    background: linear-gradient(135deg, #fffdf7 0%, #fef9eb 100%);
+  }
+
+  .tab-active {
+    @apply bg-white text-brand-700 shadow-sm font-semibold;
+  }
+
+  .tab-inactive {
+    @apply text-gray-500;
+  }
+}
+
+/* Recharts fix */
+.recharts-wrapper {
+  font-family: var(--font-sans) !important;
+}
