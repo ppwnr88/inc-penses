@@ -3,10 +3,10 @@
 import type { LiffProfile } from '@/types/liff'
 
 export const MOCK_PROFILE: LiffProfile = {
-  userId: 'mock_user_001',
-  displayName: 'ผู้ใช้ทดสอบ',
+  userId: 'demo_user_line_001',
+  displayName: 'สมชาย ใจดี',
   pictureUrl: undefined,
-  statusMessage: 'กำลังทดสอบแอป',
+  statusMessage: 'กำลังทดสอบแอปเงินจด',
 }
 
 export async function fetchLiffProfile(): Promise<LiffProfile | null> {
