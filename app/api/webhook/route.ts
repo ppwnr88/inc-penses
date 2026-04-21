@@ -14,6 +14,10 @@ import { DEFAULT_CATEGORIES } from '@/lib/utils/categories'
 
 export const runtime = 'nodejs'
 
+export async function GET() {
+  return NextResponse.json({ ok: true, service: 'เงินจด webhook', ts: new Date().toISOString() })
+}
+
 // LINE event types (minimal)
 interface LineTextEvent {
   type: 'message'
@@ -38,11 +42,16 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.text()
   const signature = req.headers.get('x-line-signature') ?? ''
 
+  console.log('[webhook] POST received, sig:', signature.slice(0, 10) + '...')
+
   if (!verifyLineSignature(rawBody, signature)) {
+    console.log('[webhook] Invalid signature — secret length:', process.env.LINE_CHANNEL_SECRET?.trim().length)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
   }
 
   const body = JSON.parse(rawBody) as { events: LineEvent[] }
+  console.log('[webhook] events:', body.events.length, body.events.map(e => e.type))
+
   await Promise.all(body.events.map(handleEvent))
 
   return NextResponse.json({ ok: true })
