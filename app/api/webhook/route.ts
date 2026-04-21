@@ -10,6 +10,7 @@ import {
   unknownMessage,
 } from '@/lib/line/reply'
 import { createServerClient } from '@/lib/supabase/server'
+import { DEFAULT_CATEGORIES } from '@/lib/utils/categories'
 
 export const runtime = 'nodejs'
 
@@ -92,19 +93,9 @@ async function handleTextMessage(event: LineTextEvent) {
 
   // Record transaction
   const supabase = createServerClient()
-
-  // Get or create profile
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('line_user_id', userId)
-    .single()
-
+  const profile = await getOrCreateProfile(supabase, userId)
   if (!profile) {
-    await replyMessage(replyToken, [{
-      type: 'text',
-      text: 'ยังไม่ได้ลงทะเบียน กรุณาเปิดแอปก่อนนะ 😊',
-    }])
+    await replyMessage(replyToken, [{ type: 'text', text: 'เกิดข้อผิดพลาด ลองใหม่นะ 🙏' }])
     return
   }
 
@@ -157,13 +148,12 @@ async function handlePostback(event: LinePostbackEvent) {
     if (!txId) return
 
     const supabase = createServerClient()
+    const profile = await getOrCreateProfile(supabase, event.source.userId)
     const { error } = await supabase
       .from('transactions')
       .delete()
       .eq('id', txId)
-      .eq('profile_id', (
-        await supabase.from('profiles').select('id').eq('line_user_id', event.source.userId).single()
-      ).data?.id ?? '')
+      .eq('profile_id', profile?.id ?? '')
 
     await replyMessage(event.replyToken, [{
       type: 'text',
@@ -172,10 +162,47 @@ async function handlePostback(event: LinePostbackEvent) {
   }
 }
 
+// ── Auto-create profile from LINE userId ─────────────────────────────────────
+async function fetchLineDisplayName(userId: string): Promise<string> {
+  try {
+    const res = await fetch(`https://api.line.me/v2/bot/profile/${userId}`, {
+      headers: { Authorization: `Bearer ${process.env.LINE_CHANNEL_ACCESS_TOKEN}` },
+    })
+    if (res.ok) {
+      const data = await res.json() as { displayName?: string }
+      return data.displayName ?? 'คุณ'
+    }
+  } catch { /* ignore */ }
+  return 'คุณ'
+}
+
+async function getOrCreateProfile(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  userId: string,
+): Promise<{ id: string } | null> {
+  const { data: existing } = await supabase
+    .from('profiles').select('id').eq('line_user_id', userId).single()
+  if (existing) return existing
+
+  // New user — fetch display name from LINE then create profile + seed categories
+  const displayName = await fetchLineDisplayName(userId)
+  const { data: created } = await supabase
+    .from('profiles')
+    .insert({ line_user_id: userId, display_name: displayName })
+    .select('id')
+    .single()
+  if (!created) return null
+
+  await supabase.from('categories').insert(
+    DEFAULT_CATEGORIES.map(c => ({ ...c, profile_id: created.id }))
+  )
+  return created
+}
+
 async function deleteLastTransaction(userId: string, replyToken: string) {
   const supabase = createServerClient()
-  const { data: profile } = await supabase
-    .from('profiles').select('id').eq('line_user_id', userId).single()
+  const profile = await getOrCreateProfile(supabase, userId)
 
   if (!profile) return
 
@@ -202,11 +229,9 @@ async function deleteLastTransaction(userId: string, replyToken: string) {
 
 async function sendSummary(userId: string, replyToken: string) {
   const supabase = createServerClient()
-  const { data: profile } = await supabase
-    .from('profiles').select('id').eq('line_user_id', userId).single()
-
+  const profile = await getOrCreateProfile(supabase, userId)
   if (!profile) {
-    await replyMessage(replyToken, [{ type: 'text', text: 'ยังไม่มีข้อมูล เริ่มจดรายการได้เลย!' }])
+    await replyMessage(replyToken, [{ type: 'text', text: 'เกิดข้อผิดพลาด ลองใหม่นะ 🙏' }])
     return
   }
 
