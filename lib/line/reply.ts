@@ -97,13 +97,13 @@ export function transactionConfirmedFlex(opts: {
   const row = (iconUrl: string, iconBg: string, labelText: string, value: string) => ({
     type: 'box' as const,
     layout: 'horizontal' as const,
-    paddingTop: '9px',
-    paddingBottom: '9px',
+    paddingTop: '5px',
+    paddingBottom: '5px',
     alignItems: 'center' as const,
     contents: [
-      iconCircle(iconUrl, iconBg, '34px', '17px'),
-      { type: 'text' as const, text: labelText, size: 'sm' as const, color: '#888888', flex: 3, margin: 'md' as const },
-      { type: 'text' as const, text: value, size: 'sm' as const, color: '#1a1a1a', weight: 'bold' as const, align: 'end' as const, flex: 4, wrap: true },
+      iconCircle(iconUrl, iconBg, '30px', '15px'),
+      { type: 'text' as const, text: labelText, size: 'xs' as const, color: '#888888', flex: 3, margin: 'md' as const },
+      { type: 'text' as const, text: value, size: 'xs' as const, color: '#1a1a1a', align: 'end' as const, flex: 4, wrap: true },
     ],
   })
 
@@ -113,15 +113,15 @@ export function transactionConfirmedFlex(opts: {
     layout: 'horizontal' as const,
     backgroundColor: bg,
     cornerRadius: '10px',
-    paddingTop: '11px',
-    paddingBottom: '11px',
+    paddingTop: '8px',
+    paddingBottom: '8px',
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
     flex,
     action,
     contents: [
-      { type: 'image' as const, url: iconUrl, size: '18px', aspectMode: 'fit' as const, aspectRatio: '1:1', flex: 0 },
-      { type: 'text' as const, text, color: '#ffffff', size: 'sm' as const, weight: 'bold' as const, margin: 'sm' as const, flex: 0 },
+      { type: 'image' as const, url: iconUrl, size: '14px', aspectMode: 'fit' as const, aspectRatio: '1:1', flex: 0 },
+      { type: 'text' as const, text, color: '#ffffff', size: 'xs' as const, margin: 'sm' as const, flex: 0 },
     ],
   })
 
@@ -133,11 +133,11 @@ export function transactionConfirmedFlex(opts: {
         justifyContent: 'center',
         alignItems: 'center',
         contents: [
-          { type: 'text', text: '✦', size: 'sm', color: accentClr, align: 'center' },
+          { type: 'text', text: '✦', size: 'xs', color: accentClr, align: 'center' },
           { type: 'text', text: '✦', size: 'xxs', color: accentClr, align: 'center' },
         ],
       }
-    : iconCircle(fa('arrow-down', accentClr), iconBg, '40px', '18px')
+    : iconCircle(fa('arrow-down', accentClr), iconBg, '34px', '15px')
 
   return {
     type: 'flex',
@@ -149,30 +149,25 @@ export function transactionConfirmedFlex(opts: {
         type: 'box',
         layout: 'horizontal' as const,
         backgroundColor: headerBg,
-        paddingAll: '12px',
+        paddingAll: '10px',
         alignItems: 'center' as const,
         contents: [
           iconCircle(
             isIncome ? fa('arrow-up', accentClr) : fa('wallet', accentClr),
-            iconBg, '48px', '22px'
+            iconBg, '42px', '20px'
           ),
           {
             type: 'box' as const,
-            layout: 'horizontal' as const,
+            layout: 'vertical' as const,
             flex: 1,
             paddingStart: '12px',
-            paddingEnd: '8px',
-            alignItems: 'center' as const,
             contents: [
-              { type: 'text' as const, text: headerText, size: 'md' as const, color: accentClr, weight: 'bold' as const, flex: 1 },
+              { type: 'text' as const, text: headerText, size: 'xs' as const, color: accentClr },
               {
                 type: 'text' as const,
                 text: `${sign}฿${amount}`,
-                size: 'xl' as const,
-                weight: 'bold' as const,
+                size: 'lg' as const,
                 color: accentClr,
-                align: 'end' as const,
-                flex: 1,
                 adjustMode: 'shrink-to-fit' as const,
               },
             ],
@@ -183,18 +178,28 @@ export function transactionConfirmedFlex(opts: {
       body: {
         type: 'box',
         layout: 'vertical' as const,
-        backgroundColor: '#ffffff',
-        paddingStart: '22px',
-        paddingEnd: '22px',
-        paddingTop: '12px',
-        paddingBottom: '8px',
+        backgroundColor: '#f5f5f5',
+        paddingAll: '10px',
+        paddingTop: '6px',
         spacing: 'none' as const,
         contents: [
-          row(isIncome ? fa('tag', '4a7c59') : fa('utensils', '4a7c59'), '#d5edd5', labelCategory, opts.category),
-          { type: 'separator' as const, color: '#f0f0f0' },
-          row(isIncome ? fa('wallet', '7b5ea7') : fa('basket-shopping', '7b5ea7'), '#e8e0f0', labelDescription, opts.note),
-          { type: 'separator' as const, color: '#f0f0f0' },
-          row(fa('calendar-days', '3a7bc8'), '#dce8f5', labelDate, dateStr),
+          {
+            type: 'box' as const,
+            layout: 'vertical' as const,
+            backgroundColor: '#ffffff',
+            cornerRadius: '12px',
+            paddingStart: '12px',
+            paddingEnd: '12px',
+            paddingTop: '3px',
+            paddingBottom: '3px',
+            contents: [
+              row(isIncome ? fa('tag', '4a7c59') : fa('utensils', '4a7c59'), '#d5edd5', labelCategory, opts.category),
+              { type: 'separator' as const, color: '#f0f0f0' },
+              row(isIncome ? fa('wallet', '7b5ea7') : fa('basket-shopping', '7b5ea7'), '#e8e0f0', labelDescription, opts.note),
+              { type: 'separator' as const, color: '#f0f0f0' },
+              row(fa('calendar-days', '3a7bc8'), '#dce8f5', labelDate, dateStr),
+            ],
+          },
         ],
       },
       footer: {
@@ -202,8 +207,8 @@ export function transactionConfirmedFlex(opts: {
         layout: 'horizontal' as const,
         spacing: 'md' as const,
         backgroundColor: '#f5f5f5',
-        paddingAll: '12px',
-        paddingTop: '10px',
+        paddingAll: '10px',
+        paddingTop: '4px',
         contents: [
           actionBox(fa('trash-can', 'ffffff'), cancelLabel, '#e8837a', {
             type: 'postback',
@@ -215,7 +220,7 @@ export function transactionConfirmedFlex(opts: {
             type: 'uri',
             label: summaryLabel,
             uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}`,
-          }, 1),
+          }, 2),
         ],
       },
     },
