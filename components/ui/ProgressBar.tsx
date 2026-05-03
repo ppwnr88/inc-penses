@@ -5,6 +5,7 @@ interface ProgressBarProps {
   value: number
   max?: number
   showLabel?: boolean
+  label?: string
   className?: string
   size?: 'sm' | 'md' | 'lg'
 }
@@ -22,6 +23,7 @@ export function ProgressBar({
   value,
   max = 100,
   showLabel = false,
+  label,
   className,
   size = 'md',
 }: ProgressBarProps) {
@@ -32,7 +34,7 @@ export function ProgressBar({
     <div className={className}>
       {showLabel && (
         <div className="flex justify-between items-center mb-1">
-          <span className="text-xs text-gray-500">ใช้ไป</span>
+          <span className="text-xs text-gray-500">{label ?? 'ใช้ไป'}</span>
           <span
             className={twMerge(
               'text-xs font-medium',

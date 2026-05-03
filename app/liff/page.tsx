@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Plus, Bell } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useAuth } from '@/features/auth/useAuth'
 import { DashboardSummary } from '@/features/dashboard/DashboardSummary'
 import { RecentTransactions } from '@/features/dashboard/RecentTransactions'
@@ -15,9 +15,11 @@ import { useBudgets } from '@/features/budgets/useBudgets'
 import { getThaiMonthName, getCurrentMonthYear } from '@/lib/utils/date'
 import type { Transaction } from '@/types'
 import Link from 'next/link'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
 export default function DashboardPage() {
   const { profile } = useAuth()
+  const { t, lang } = usePreferences()
   const { month, year } = getCurrentMonthYear()
   const [showForm, setShowForm] = useState(false)
 
@@ -47,23 +49,25 @@ export default function DashboardPage() {
 
   const greeting = (() => {
     const hour = new Date().getHours()
-    if (hour < 12) return 'อรุณสวัสดิ์'
-    if (hour < 18) return 'สวัสดีตอนบ่าย'
-    return 'สวัสดีตอนเย็น'
+    if (hour < 12) return t.dashboard.greeting_morning
+    if (hour < 18) return t.dashboard.greeting_afternoon
+    return t.dashboard.greeting_evening
   })()
 
+  const monthDisplay = lang === 'th'
+    ? `${getThaiMonthName(month)} ${year + 543}`
+    : `${new Date(year, month - 1, 1).toLocaleDateString('en-US', { month: 'long' })} ${year}`
+
   return (
-    <div className="page-container pt-4 space-y-4">
+    <div className="page-container pt-4 space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between pt-2">
         <div>
           <p className="text-xs text-gray-400">{greeting}</p>
           <h1 className="text-lg font-bold text-gray-900">
-            {profile?.display_name ?? 'คุณผู้ใช้'} 👋
+            {profile?.display_name ?? t.dashboard.defaultUser} 👋
           </h1>
-          <p className="text-xs text-gray-400">
-            {getThaiMonthName(month)} {year + 543}
-          </p>
+          <p className="text-xs text-gray-400">{monthDisplay}</p>
         </div>
         <div className="flex items-center gap-2">
           <Link
@@ -98,14 +102,14 @@ export default function DashboardPage() {
       {!budgetLoading && budgets.length > 0 && (
         <Card padding="md">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-800">งบประมาณเดือนนี้</h3>
+            <h3 className="text-sm font-semibold text-gray-800">{t.dashboard.budget}</h3>
             <Link href="/liff/budgets" className="text-xs text-brand-600">
-              ดูรายละเอียด →
+              {t.dashboard.budgetDetail}
             </Link>
           </div>
-          <ProgressBar value={totalSpent} max={totalBudget} showLabel size="lg" />
+          <ProgressBar value={totalSpent} max={totalBudget} showLabel size="lg" label={t.dashboard.budgetUsed} />
           <p className="text-xs text-gray-400 mt-1.5 text-center">
-            ใช้ไป {budgetPercent}% จากงบทั้งหมด
+            {t.dashboard.budgetUsed} {budgetPercent}% {t.dashboard.budgetOf}
           </p>
         </Card>
       )}
@@ -113,8 +117,8 @@ export default function DashboardPage() {
       {budgets.length === 0 && !budgetLoading && (
         <Link href="/liff/budgets">
           <Card padding="md" hover className="border-2 border-dashed border-brand-200 bg-brand-50/50 text-center">
-            <p className="text-sm text-brand-600 font-medium">🎯 ตั้งงบประมาณเดือนนี้</p>
-            <p className="text-xs text-brand-400 mt-1">ควบคุมการใช้จ่ายได้ง่ายขึ้น</p>
+            <p className="text-sm text-brand-600 font-medium">{t.dashboard.setBudget}</p>
+            <p className="text-xs text-brand-400 mt-1">{t.dashboard.setBudgetDesc}</p>
           </Card>
         </Link>
       )}
@@ -131,13 +135,13 @@ export default function DashboardPage() {
         <Link href="/liff/reports">
           <Card padding="md" hover className="text-center">
             <div className="text-2xl mb-1">📊</div>
-            <p className="text-xs font-medium text-gray-700">ดูรายงาน</p>
+            <p className="text-xs font-medium text-gray-700">{t.dashboard.viewReports}</p>
           </Card>
         </Link>
         <Link href="/liff/recurring">
           <Card padding="md" hover className="text-center">
             <div className="text-2xl mb-1">🔄</div>
-            <p className="text-xs font-medium text-gray-700">รายการประจำ</p>
+            <p className="text-xs font-medium text-gray-700">{t.dashboard.recurring}</p>
           </Card>
         </Link>
       </div>
@@ -151,7 +155,7 @@ export default function DashboardPage() {
       </button>
 
       {/* Transaction Modal */}
-      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title="บันทึกรายการ">
+      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title={t.transactions.addTitle}>
         <TransactionForm
           categories={categories}
           onSubmit={handleCreateTransaction}

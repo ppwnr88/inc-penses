@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'เงินจด — ผู้ช่วยจดรายรับรายจ่ายส่วนตัว',
+  title: 'จด — ผู้ช่วยจดรายรับรายจ่ายส่วนตัว',
   description: 'ผู้ช่วยจดรายรับรายจ่ายส่วนตัว ผ่าน LINE — ง่าย เร็ว ไม่ยุ่งยาก',
-  keywords: ['บัญชีรายรับรายจ่าย', 'LINE LIFF', 'เงินจด', 'จดรายรับ', 'จดรายจ่าย'],
+  keywords: ['บัญชีรายรับรายจ่าย', 'LINE LIFF', 'จด', 'จดรายรับ', 'จดรายจ่าย'],
   manifest: '/manifest.json',
   viewport: {
     width: 'device-width',

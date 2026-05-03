@@ -1,11 +1,18 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
-// Using untyped client in server routes to avoid complex type inference issues.
-// Runtime safety is handled by Zod validation at the API boundary.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createServerClient() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return createSupabaseClient<any>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
+
+// Bypasses RLS — use in webhook/server routes where no user session exists
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createAdminClient() {
+  return createSupabaseClient<any>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 }

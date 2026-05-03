@@ -10,8 +10,10 @@ import { ErrorState } from '@/components/ui/ErrorState'
 import { useCategories } from '@/features/categories/useCategories'
 import type { Category } from '@/types'
 import { twMerge } from 'tailwind-merge'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
 export default function CategoriesPage() {
+  const { t } = usePreferences()
   const { categories, loading, error, refetch, createCategory, updateCategory, deleteCategory, filterByType } = useCategories()
   const [showForm, setShowForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
@@ -29,7 +31,7 @@ export default function CategoriesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('ต้องการลบหมวดหมู่นี้?')) return
+    if (!confirm(t.categories.deleteConfirm)) return
     await deleteCategory(id)
   }
 
@@ -40,14 +42,14 @@ export default function CategoriesPage() {
   return (
     <div className="page-container pt-0 space-y-3">
       <Header
-        title="หมวดหมู่"
+        title={t.categories.title}
         rightAction={
           <button
             onClick={() => setShowForm(true)}
             className="flex items-center gap-1 bg-brand-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl"
           >
             <Plus size={14} />
-            เพิ่ม
+            {t.categories.add}
           </button>
         }
       />
@@ -64,7 +66,7 @@ export default function CategoriesPage() {
                 activeTab === tab ? 'bg-white shadow-sm text-brand-700' : 'text-gray-500'
               )}
             >
-              {tab === 'expense' ? 'รายจ่าย' : 'รายรับ'}
+              {tab === 'expense' ? t.categories.expense : t.categories.income}
             </button>
           ))}
         </div>
@@ -77,7 +79,7 @@ export default function CategoriesPage() {
         />
       </div>
 
-      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title="เพิ่มหมวดหมู่">
+      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title={t.categories.addTitle}>
         <CategoryForm
           onSubmit={handleCreate}
           onCancel={() => setShowForm(false)}
@@ -88,7 +90,7 @@ export default function CategoriesPage() {
       <Modal
         isOpen={!!editingCategory}
         onClose={() => setEditingCategory(null)}
-        title="แก้ไขหมวดหมู่"
+        title={t.categories.editTitle}
       >
         {editingCategory && (
           <CategoryForm

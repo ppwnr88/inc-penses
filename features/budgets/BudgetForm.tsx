@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -8,13 +8,12 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import type { Budget, Category } from '@/types'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
-const schema = z.object({
-  category_id: z.string().min(1, 'กรุณาเลือกหมวดหมู่'),
-  amount: z.string().min(1, 'กรุณาระบุจำนวนเงิน').refine(v => parseFloat(v) > 0, 'ต้องมากกว่า 0'),
-})
-
-type FormData = z.infer<typeof schema>
+type FormData = {
+  category_id: string
+  amount: string
+}
 
 interface BudgetFormProps {
   categories: Category[]
@@ -27,6 +26,15 @@ interface BudgetFormProps {
 }
 
 export function BudgetForm({ categories, month, year, onSubmit, onCancel, defaultValues, isEditing = false }: BudgetFormProps) {
+  const { t } = usePreferences()
+
+  const schema = useMemo(() => z.object({
+    category_id: z.string().min(1, t.form.validationCategoryName),
+    amount: z.string()
+      .min(1, t.form.validationAmount)
+      .refine(v => parseFloat(v) > 0, t.form.validationAmountPositive),
+  }), [t])
+
   const expenseCategories = categories.filter(c => c.type === 'expense')
   const categoryOptions = expenseCategories.map(c => ({ value: c.id, label: `${c.icon} ${c.name}` }))
 
@@ -51,15 +59,15 @@ export function BudgetForm({ categories, month, year, onSubmit, onCancel, defaul
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       <Select
-        label="หมวดหมู่"
+        label={t.categories.title}
         options={categoryOptions}
-        placeholder="เลือกหมวดหมู่"
+        placeholder={t.budgets.selectCategory}
         {...register('category_id')}
         error={errors.category_id?.message}
       />
 
       <Input
-        label="งบประมาณ (บาท)"
+        label={t.budgets.setBudgetAmountLabel}
         type="number"
         step="0.01"
         min="0"
@@ -72,10 +80,10 @@ export function BudgetForm({ categories, month, year, onSubmit, onCancel, defaul
 
       <div className="flex gap-3 pt-2">
         <Button type="button" variant="ghost" fullWidth onClick={onCancel}>
-          ยกเลิก
+          {t.common.cancel}
         </Button>
         <Button type="submit" fullWidth loading={isSubmitting}>
-          {isEditing ? 'บันทึก' : 'ตั้งงบประมาณ'}
+          {isEditing ? t.common.save : t.budgets.addTitle}
         </Button>
       </div>
     </form>

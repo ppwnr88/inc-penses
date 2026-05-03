@@ -1,22 +1,20 @@
 'use client'
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
 import type { Category } from '@/types'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
-const schema = z.object({
-  name: z.string().min(1, 'กรุณาระบุชื่อหมวดหมู่').max(30),
-  type: z.enum(['income', 'expense']),
-  icon: z.string().min(1, 'กรุณาเลือก icon'),
-  color: z.string().min(1),
-})
-
-type FormData = z.infer<typeof schema>
+type FormData = {
+  name: string
+  type: 'income' | 'expense'
+  icon: string
+  color: string
+}
 
 const ICON_OPTIONS = ['🍜', '🚗', '🏠', '🛍️', '💊', '🎬', '📚', '💸', '💼', '📈', '💰', '🎯', '☕', '✈️', '🎓', '🛒', '🏋️', '🎮', '🐾', '👶']
 
@@ -28,6 +26,15 @@ interface CategoryFormProps {
 }
 
 export function CategoryForm({ onSubmit, onCancel, defaultValues, isEditing = false }: CategoryFormProps) {
+  const { t } = usePreferences()
+
+  const schema = useMemo(() => z.object({
+    name: z.string().min(1, t.form.validationCategoryName).max(30),
+    type: z.enum(['income', 'expense']),
+    icon: z.string().min(1, t.form.validationIcon),
+    color: z.string().min(1),
+  }), [t])
+
   const {
     register,
     handleSubmit,
@@ -69,20 +76,20 @@ export function CategoryForm({ onSubmit, onCancel, defaultValues, isEditing = fa
               watch('type') === type ? 'bg-white shadow-sm text-brand-700' : 'text-gray-500'
             }`}
           >
-            {type === 'income' ? 'รายรับ' : 'รายจ่าย'}
+            {type === 'income' ? t.categories.income : t.categories.expense}
           </button>
         ))}
       </div>
 
       <Input
-        label="ชื่อหมวดหมู่"
-        placeholder="เช่น ค่ากาแฟ"
+        label={t.categories.nameLabel}
+        placeholder={t.categories.namePlaceholder}
         {...register('name')}
         error={errors.name?.message}
       />
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">ไอคอน</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">{t.categories.iconLabel}</label>
         <div className="grid grid-cols-10 gap-1">
           {ICON_OPTIONS.map(icon => (
             <button
@@ -101,7 +108,7 @@ export function CategoryForm({ onSubmit, onCancel, defaultValues, isEditing = fa
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">สี</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.categories.colorLabel}</label>
         <input
           type="color"
           {...register('color')}
@@ -111,10 +118,10 @@ export function CategoryForm({ onSubmit, onCancel, defaultValues, isEditing = fa
 
       <div className="flex gap-3 pt-2">
         <Button type="button" variant="ghost" fullWidth onClick={onCancel}>
-          ยกเลิก
+          {t.common.cancel}
         </Button>
         <Button type="submit" fullWidth loading={isSubmitting}>
-          {isEditing ? 'บันทึก' : 'เพิ่มหมวดหมู่'}
+          {isEditing ? t.common.save : t.categories.addTitle}
         </Button>
       </div>
     </form>

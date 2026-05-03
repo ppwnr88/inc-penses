@@ -3,6 +3,7 @@
 import React from 'react'
 import type { Category, TransactionFilters } from '@/types'
 import { twMerge } from 'tailwind-merge'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
 interface TransactionFiltersProps {
   filters: TransactionFilters
@@ -10,17 +11,19 @@ interface TransactionFiltersProps {
   onFilterChange: (filters: TransactionFilters) => void
 }
 
-const typeOptions = [
-  { value: 'all', label: 'ทั้งหมด' },
-  { value: 'income', label: 'รายรับ' },
-  { value: 'expense', label: 'รายจ่าย' },
-]
-
 export function TransactionFilters({
   filters,
   categories,
   onFilterChange,
 }: TransactionFiltersProps) {
+  const { t } = usePreferences()
+
+  const typeOptions = [
+    { value: 'all', label: t.common.all },
+    { value: 'income', label: t.common.income },
+    { value: 'expense', label: t.common.expense },
+  ]
+
   return (
     <div className="space-y-3">
       {/* Type filter */}
@@ -54,7 +57,7 @@ export function TransactionFilters({
               : 'bg-white text-gray-500 border border-gray-200'
           )}
         >
-          ทุกหมวด
+          {t.common.allCategories}
         </button>
         {categories.map(cat => (
           <button

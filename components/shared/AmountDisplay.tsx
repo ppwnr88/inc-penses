@@ -1,6 +1,9 @@
+'use client'
+
 import React from 'react'
 import { twMerge } from 'tailwind-merge'
 import { formatCurrency } from '@/lib/utils/currency'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 import type { TransactionType } from '@/types'
 
 interface AmountDisplayProps {
@@ -25,6 +28,7 @@ export function AmountDisplay({
   size = 'md',
   className,
 }: AmountDisplayProps) {
+  const { currencySymbol } = usePreferences()
   const isIncome = type === 'income'
   const isExpense = type === 'expense'
 
@@ -40,7 +44,7 @@ export function AmountDisplay({
       )}
     >
       {isIncome ? '+' : isExpense ? '-' : ''}
-      {formatCurrency(amount, compact)}
+      {formatCurrency(amount, compact, currencySymbol)}
     </span>
   )
 }

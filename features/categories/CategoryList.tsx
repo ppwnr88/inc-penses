@@ -6,6 +6,7 @@ import type { Category } from '@/types'
 import { CategoryIcon } from '@/components/shared/CategoryIcon'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
 interface CategoryListProps {
   categories: Category[]
@@ -15,6 +16,8 @@ interface CategoryListProps {
 }
 
 export function CategoryList({ categories, loading, onEdit, onDelete }: CategoryListProps) {
+  const { t } = usePreferences()
+
   if (loading) {
     return (
       <div className="space-y-2">
@@ -36,8 +39,8 @@ export function CategoryList({ categories, loading, onEdit, onDelete }: Category
     return (
       <EmptyState
         icon="🏷️"
-        title="ยังไม่มีหมวดหมู่"
-        description="เพิ่มหมวดหมู่เพื่อจัดระเบียบรายการ"
+        title={t.categories.empty}
+        description={t.categories.emptyDesc}
       />
     )
   }
@@ -53,7 +56,7 @@ export function CategoryList({ categories, loading, onEdit, onDelete }: Category
           <div className="flex-1">
             <p className="text-sm font-medium text-gray-800">{cat.name}</p>
             {cat.is_default && (
-              <p className="text-xs text-gray-400">หมวดหมู่เริ่มต้น</p>
+              <p className="text-xs text-gray-400">{t.categories.defaultLabel}</p>
             )}
           </div>
           <div className="flex gap-1">

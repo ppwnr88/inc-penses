@@ -1,4 +1,21 @@
-export function formatCurrency(amount: number, compact = false): string {
+export function formatCurrency(amount: number, compact = false, currencySymbol?: string): string {
+  // Custom symbol: format as number + prepend symbol
+  if (currencySymbol && currencySymbol !== '฿') {
+    const locale = 'en-US'
+    if (compact && Math.abs(amount) >= 1000) {
+      const formatted = new Intl.NumberFormat(locale, {
+        notation: 'compact',
+        maximumFractionDigits: 1,
+      }).format(amount)
+      return `${currencySymbol}${formatted}`
+    }
+    return `${currencySymbol}${new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount)}`
+  }
+
+  // Default THB (฿) formatting
   if (compact && Math.abs(amount) >= 1000) {
     return new Intl.NumberFormat('th-TH', {
       style: 'currency',

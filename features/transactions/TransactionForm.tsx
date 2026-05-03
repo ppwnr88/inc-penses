@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -11,16 +11,15 @@ import { Select } from '@/components/ui/Select'
 import type { Category, Transaction, TransactionType } from '@/types'
 import { todayString } from '@/lib/utils/date'
 import { twMerge } from 'tailwind-merge'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
-const schema = z.object({
-  type: z.enum(['income', 'expense']),
-  amount: z.string().min(1, 'กรุณาระบุจำนวนเงิน').refine(v => parseFloat(v) > 0, 'จำนวนเงินต้องมากกว่า 0'),
-  category_id: z.string().optional(),
-  date: z.string().min(1, 'กรุณาเลือกวันที่'),
-  note: z.string().max(200).optional(),
-})
-
-type FormData = z.infer<typeof schema>
+type FormData = {
+  type: 'income' | 'expense'
+  amount: string
+  category_id?: string
+  date: string
+  note?: string
+}
 
 type InputTab = 'manual' | 'voice' | 'ocr'
 
@@ -39,16 +38,26 @@ export function TransactionForm({
   defaultValues,
   isEditing = false,
 }: TransactionFormProps) {
+  const { t } = usePreferences()
   const [activeType, setActiveType] = useState<TransactionType>(defaultValues?.type ?? 'expense')
   const [activeTab, setActiveTab] = useState<InputTab>('manual')
   const [submitting, setSubmitting] = useState(false)
+
+  const schema = useMemo(() => z.object({
+    type: z.enum(['income', 'expense']),
+    amount: z.string()
+      .min(1, t.form.validationAmount)
+      .refine(v => parseFloat(v) > 0, t.form.validationAmountPositive),
+    category_id: z.string().optional(),
+    date: z.string().min(1, t.form.validationDate),
+    note: z.string().max(200).optional(),
+  }), [t])
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -61,7 +70,7 @@ export function TransactionForm({
   const filteredCategories = categories.filter(c => c.type === activeType)
 
   const categoryOptions = [
-    { value: '', label: 'ไม่ระบุหมวดหมู่' },
+    { value: '', label: t.form.noCategory },
     ...filteredCategories.map(c => ({ value: c.id, label: `${c.icon} ${c.name}` })),
   ]
 
@@ -107,7 +116,7 @@ export function TransactionForm({
                 : 'text-gray-500'
             )}
           >
-            {type === 'income' ? '+ รายรับ' : '- รายจ่าย'}
+            {type === 'income' ? t.form.incomeBtn : t.form.expenseBtn}
           </button>
         ))}
       </div>
@@ -115,10 +124,10 @@ export function TransactionForm({
       {/* Input Method Tabs */}
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
         {([
-          { id: 'manual', icon: Keyboard, label: 'พิมพ์' },
-          { id: 'voice', icon: Mic, label: 'เสียง' },
-          { id: 'ocr', icon: Camera, label: 'สแกน' },
-        ] as const).map(tab => (
+          { id: 'manual' as const, icon: Keyboard, label: t.form.manual },
+          { id: 'voice' as const, icon: Mic, label: t.form.voice },
+          { id: 'ocr' as const, icon: Camera, label: t.form.scan },
+        ]).map(tab => (
           <button
             key={tab.id}
             type="button"
@@ -133,7 +142,7 @@ export function TransactionForm({
             <tab.icon size={13} />
             {tab.label}
             {(tab.id === 'voice' || tab.id === 'ocr') && (
-              <span className="text-[10px] bg-brand-100 text-brand-600 px-1 rounded">เร็วๆนี้</span>
+              <span className="text-[10px] bg-brand-100 text-brand-600 px-1 rounded">{t.form.comingSoon}</span>
             )}
           </button>
         ))}
@@ -142,23 +151,23 @@ export function TransactionForm({
       {activeTab === 'voice' && (
         <div className="bg-brand-50 rounded-2xl p-4 text-center text-sm text-brand-600">
           <div className="text-3xl mb-2">🎙️</div>
-          <p className="font-medium">บันทึกด้วยเสียง</p>
-          <p className="text-xs text-brand-400 mt-1">ฟีเจอร์นี้กำลังพัฒนา จะเปิดใช้งานเร็วๆ นี้</p>
+          <p className="font-medium">{t.form.voiceTitle}</p>
+          <p className="text-xs text-brand-400 mt-1">{t.form.voiceDesc}</p>
         </div>
       )}
 
       {activeTab === 'ocr' && (
         <div className="bg-brand-50 rounded-2xl p-4 text-center text-sm text-brand-600">
           <div className="text-3xl mb-2">📷</div>
-          <p className="font-medium">สแกนใบเสร็จ</p>
-          <p className="text-xs text-brand-400 mt-1">ฟีเจอร์นี้กำลังพัฒนา จะเปิดใช้งานเร็วๆ นี้</p>
+          <p className="font-medium">{t.form.ocrTitle}</p>
+          <p className="text-xs text-brand-400 mt-1">{t.form.ocrDesc}</p>
         </div>
       )}
 
       {/* Amount */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">
-          จำนวนเงิน (บาท)
+          {t.form.amountLabel}
         </label>
         <div className="relative">
           <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 text-sm">฿</span>
@@ -182,7 +191,7 @@ export function TransactionForm({
 
       {/* Category */}
       <Select
-        label="หมวดหมู่"
+        label={t.form.categoryLabel}
         options={categoryOptions}
         {...register('category_id')}
         error={errors.category_id?.message}
@@ -190,7 +199,7 @@ export function TransactionForm({
 
       {/* Date */}
       <Input
-        label="วันที่"
+        label={t.form.dateLabel}
         type="date"
         {...register('date')}
         error={errors.date?.message}
@@ -199,12 +208,12 @@ export function TransactionForm({
       {/* Note */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">
-          หมายเหตุ
+          {t.form.noteLabel}
         </label>
         <textarea
           {...register('note')}
           rows={2}
-          placeholder="เพิ่มหมายเหตุ (ไม่บังคับ)"
+          placeholder={t.form.notePlaceholder}
           className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent resize-none transition-all"
         />
         {errors.note && <p className="mt-1 text-xs text-red-500">{errors.note.message}</p>}
@@ -213,7 +222,7 @@ export function TransactionForm({
       {/* Actions */}
       <div className="flex gap-3 pt-2">
         <Button type="button" variant="ghost" fullWidth onClick={onCancel}>
-          ยกเลิก
+          {t.common.cancel}
         </Button>
         <Button
           type="submit"
@@ -221,7 +230,7 @@ export function TransactionForm({
           loading={submitting}
           variant={activeType === 'income' ? 'primary' : 'danger'}
         >
-          {isEditing ? 'บันทึกการแก้ไข' : activeType === 'income' ? 'บันทึกรายรับ' : 'บันทึกรายจ่าย'}
+          {isEditing ? t.form.saveEdit : activeType === 'income' ? t.form.saveIncome : t.form.saveExpense}
         </Button>
       </div>
     </form>

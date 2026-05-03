@@ -105,7 +105,7 @@ export default function LandingPage() {
             <span className="text-brand-600">ง่ายกว่าที่คิด</span>
           </h1>
           <p className="text-lg text-gray-500 mb-8 max-w-xl mx-auto leading-relaxed">
-            เงินจด คือผู้ช่วยจดรายรับรายจ่ายส่วนตัวที่อยู่ใน LINE ของคุณ
+            จด คือผู้ช่วยจดรายรับรายจ่ายส่วนตัวที่อยู่ใน LINE ของคุณ
             บันทึกง่าย ดูสรุปชัด ไม่ยุ่งยาก
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

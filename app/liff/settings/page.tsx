@@ -1,24 +1,29 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Download, ChevronRight, Bell, Calendar, User } from 'lucide-react'
+import { Download, Bell, Calendar, User, Trash2 } from 'lucide-react'
 import { Header } from '@/components/layout/Header'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
 import { useAuth } from '@/features/auth/useAuth'
-import { formatCurrency } from '@/lib/utils/currency'
+import { usePreferences, CURRENCIES } from '@/lib/i18n/PreferencesContext'
+import type { Lang } from '@/lib/i18n/translations'
 
 const APP_VERSION = '0.1.0'
 
 export default function SettingsPage() {
   const { profile, refetch } = useAuth()
+  const { t, lang, currency, setLang, setCurrency } = usePreferences()
   const [budgetDay, setBudgetDay] = useState(profile?.budget_cycle_day ?? 1)
   const [notifyEnabled, setNotifyEnabled] = useState(profile?.notify_daily ?? true)
   const [notifyTime, setNotifyTime] = useState(profile?.notify_time ?? '20:00')
   const [saving, setSaving] = useState(false)
-  const [exportLoading, setExportLoading] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [deleteFrom, setDeleteFrom] = useState('')
+  const [deleteTo, setDeleteTo] = useState('')
+  const [deleting, setDeleting] = useState(false)
+  const [deleteMsg, setDeleteMsg] = useState('')
+  const [showDeleteAll, setShowDeleteAll] = useState(false)
 
   async function handleSave() {
     if (!profile) return
@@ -41,29 +46,33 @@ export default function SettingsPage() {
     }
   }
 
-  async function handleExportAll() {
+  function handleExportAll() {
     if (!profile) return
-    setExportLoading(true)
-    try {
-      const res = await fetch(`/api/export?profile_id=${profile.id}&type=excel`)
-      if (!res.ok) throw new Error('Export failed')
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `เงินจด_ข้อมูลทั้งหมด.xlsx`
-      a.click()
-      URL.revokeObjectURL(url)
-    } catch {
-      alert('เกิดข้อผิดพลาดในการ Export')
-    } finally {
-      setExportLoading(false)
+    const url = `/api/export?profile_id=${profile.id}&type=excel`
+    window.open(url, '_blank')
+  }
+
+  async function handleLangChange(l: Lang) {
+    setLang(l)
+    if (profile?.line_user_id) {
+      fetch('/api/richmenu/switch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ line_user_id: profile.line_user_id, lang: l }),
+      }).catch(() => {})
+    }
+    if (profile?.id) {
+      fetch(`/api/profiles/${profile.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lang: l }),
+      }).catch(() => {})
     }
   }
 
   return (
     <div className="page-container pt-0 space-y-4">
-      <Header title="ตั้งค่า" />
+      <Header title={t.settings.title} />
 
       <div className="pt-3 space-y-4">
         {/* Profile */}
@@ -81,7 +90,7 @@ export default function SettingsPage() {
             </div>
             <div>
               <p className="font-semibold text-gray-900">{profile?.display_name}</p>
-              <p className="text-xs text-gray-400">ผู้ใช้งาน LINE</p>
+              <p className="text-xs text-gray-400">{t.settings.lineUser}</p>
               {profile?.email && (
                 <p className="text-xs text-gray-400">{profile.email}</p>
               )}
@@ -94,11 +103,11 @@ export default function SettingsPage() {
         <Card padding="md">
           <div className="flex items-center gap-2 mb-3">
             <Calendar size={16} className="text-brand-600" />
-            <h3 className="text-sm font-semibold text-gray-800">รอบงบประมาณ</h3>
+            <h3 className="text-sm font-semibold text-gray-800">{t.settings.budgetCycle}</h3>
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1.5">
-              วันที่เริ่มรอบงบประมาณ (วันที่ 1-28)
+              {t.settings.budgetCycleLabel}
             </label>
             <input
               type="number"
@@ -109,7 +118,7 @@ export default function SettingsPage() {
               className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
             />
             <p className="text-xs text-gray-400 mt-1">
-              รอบงบประมาณจะเริ่มในวันที่ {budgetDay} ของทุกเดือน
+              {t.settings.budgetCycleHint} {budgetDay} {t.settings.budgetCycleHint2}
             </p>
           </div>
         </Card>
@@ -118,29 +127,29 @@ export default function SettingsPage() {
         <Card padding="md">
           <div className="flex items-center gap-2 mb-3">
             <Bell size={16} className="text-brand-600" />
-            <h3 className="text-sm font-semibold text-gray-800">การแจ้งเตือน</h3>
+            <h3 className="text-sm font-semibold text-gray-800">{t.settings.notifications}</h3>
           </div>
 
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-sm text-gray-700">แจ้งเตือนประจำวัน</p>
-              <p className="text-xs text-gray-400">เตือนให้จดรายการทุกวัน</p>
+              <p className="text-sm text-gray-700">{t.settings.dailyNotify}</p>
+              <p className="text-xs text-gray-400">{t.settings.dailyNotifyDesc}</p>
             </div>
             <button
               onClick={() => setNotifyEnabled(!notifyEnabled)}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
-                notifyEnabled ? 'bg-brand-500' : 'bg-gray-200'
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                notifyEnabled ? 'bg-brand-500' : 'bg-gray-300'
               }`}
             >
-              <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                notifyEnabled ? 'translate-x-7' : 'translate-x-1'
+              <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md ring-0 transition-transform duration-200 ease-in-out ${
+                notifyEnabled ? 'translate-x-5' : 'translate-x-0'
               }`} />
             </button>
           </div>
 
           {notifyEnabled && (
             <div>
-              <label className="block text-xs text-gray-500 mb-1">เวลาแจ้งเตือน</label>
+              <label className="block text-xs text-gray-500 mb-1">{t.settings.notifyTime}</label>
               <input
                 type="time"
                 value={notifyTime}
@@ -151,33 +160,163 @@ export default function SettingsPage() {
           )}
         </Card>
 
+        {/* Currency */}
+        <Card padding="md">
+          <h3 className="text-sm font-semibold text-gray-800 mb-1">{t.settings.currency}</h3>
+          <p className="text-xs text-gray-400 mb-3">{t.settings.currencyDesc}</p>
+          <select
+            value={currency}
+            onChange={e => setCurrency(e.target.value)}
+            className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+          >
+            {CURRENCIES.map(c => (
+              <option key={c.code} value={c.code}>{c.label}</option>
+            ))}
+          </select>
+        </Card>
+
+        {/* Language */}
+        <Card padding="md">
+          <h3 className="text-sm font-semibold text-gray-800 mb-3">{t.settings.language}</h3>
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleLangChange('th')}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${lang === 'th' ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200'}`}
+            >ไทย</button>
+            <button
+              onClick={() => handleLangChange('en')}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${lang === 'en' ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200'}`}
+            >English</button>
+          </div>
+        </Card>
+
         {/* Save Button */}
         <Button fullWidth loading={saving} onClick={handleSave}>
-          {saved ? '✓ บันทึกแล้ว' : 'บันทึกการตั้งค่า'}
+          {saved ? t.settings.saved : t.settings.saveSettings}
         </Button>
 
         {/* Export */}
         <Card padding="md">
-          <h3 className="text-sm font-semibold text-gray-800 mb-3">Export ข้อมูลทั้งหมด</h3>
-          <p className="text-xs text-gray-400 mb-3">
-            ดาวน์โหลดรายการทั้งหมดเป็นไฟล์ Excel
-          </p>
+          <h3 className="text-sm font-semibold text-gray-800 mb-3">{t.settings.exportTitle}</h3>
+          <p className="text-xs text-gray-400 mb-3">{t.settings.exportDesc}</p>
           <Button
             variant="secondary"
             fullWidth
             leftIcon={<Download size={14} />}
-            loading={exportLoading}
             onClick={handleExportAll}
           >
-            ดาวน์โหลดข้อมูลทั้งหมด
+            {t.settings.exportBtn}
           </Button>
+        </Card>
+
+        {/* Delete Data */}
+        <Card padding="md">
+          <div className="flex items-center gap-2 mb-3">
+            <Trash2 size={16} className="text-red-500" />
+            <h3 className="text-sm font-semibold text-gray-800">{t.settings.deleteData}</h3>
+          </div>
+
+          {/* Date range delete */}
+          <p className="text-xs text-gray-500 mb-2">{t.settings.deleteByRange}</p>
+          <div className="flex gap-2 mb-2">
+            <input
+              type="date"
+              value={deleteFrom}
+              onChange={e => setDeleteFrom(e.target.value)}
+              className="flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+            />
+            <span className="self-center text-gray-400 text-xs">{t.settings.to}</span>
+            <input
+              type="date"
+              value={deleteTo}
+              onChange={e => setDeleteTo(e.target.value)}
+              className="flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+            />
+          </div>
+          <button
+            disabled={!deleteFrom || !deleteTo || deleting}
+            onClick={async () => {
+              if (!profile || !deleteFrom || !deleteTo) return
+              if (!confirm(`${t.settings.deleteByRange} ${deleteFrom} ${t.settings.to} ${deleteTo}?`)) return
+              setDeleting(true)
+              setDeleteMsg('')
+              try {
+                const res = await fetch(`/api/transactions?profile_id=${profile.id}&date_from=${deleteFrom}&date_to=${deleteTo}`, { method: 'DELETE' })
+                if (res.ok) {
+                  setDeleteMsg(t.settings.deleteSuccess)
+                  setDeleteFrom('')
+                  setDeleteTo('')
+                } else {
+                  setDeleteMsg(t.settings.deleteError)
+                }
+              } finally {
+                setDeleting(false)
+                setTimeout(() => setDeleteMsg(''), 3000)
+              }
+            }}
+            className="w-full rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium py-2.5 disabled:opacity-40 hover:bg-red-100 transition-colors"
+          >
+            {deleting ? t.settings.deleting : t.settings.deleteRangeBtn}
+          </button>
+
+          {/* Delete all */}
+          <div className="mt-4 pt-3 border-t border-gray-100">
+            <p className="text-xs text-gray-500 mb-2">{t.settings.deleteAll}</p>
+            {!showDeleteAll ? (
+              <button
+                onClick={() => setShowDeleteAll(true)}
+                className="w-full rounded-xl bg-white border border-red-300 text-red-500 text-sm font-medium py-2.5 hover:bg-red-50 transition-colors"
+              >
+                {t.settings.deleteAll}...
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-red-500 font-medium text-center">{t.settings.deleteAllWarning}</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowDeleteAll(false)}
+                    className="flex-1 rounded-xl border border-gray-200 text-gray-600 text-sm py-2.5 hover:bg-gray-50"
+                  >
+                    {t.settings.cancel}
+                  </button>
+                  <button
+                    disabled={deleting}
+                    onClick={async () => {
+                      if (!profile) return
+                      setDeleting(true)
+                      setDeleteMsg('')
+                      try {
+                        const res = await fetch(`/api/transactions?profile_id=${profile.id}`, { method: 'DELETE' })
+                        if (res.ok) {
+                          setDeleteMsg(t.settings.deleteSuccess)
+                          setShowDeleteAll(false)
+                        } else {
+                          setDeleteMsg(t.settings.deleteError)
+                        }
+                      } finally {
+                        setDeleting(false)
+                        setTimeout(() => setDeleteMsg(''), 3000)
+                      }
+                    }}
+                    className="flex-1 rounded-xl bg-red-500 text-white text-sm font-medium py-2.5 hover:bg-red-600 disabled:opacity-40"
+                  >
+                    {deleting ? t.settings.deleting : t.settings.confirmDelete}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {deleteMsg && (
+            <p className="text-xs text-center mt-2 text-green-600">{deleteMsg}</p>
+          )}
         </Card>
 
         {/* App Info */}
         <div className="text-center py-4 space-y-1">
-          <p className="text-base font-bold text-brand-600">เงินจด</p>
-          <p className="text-xs text-gray-400">ผู้ช่วยจดรายรับรายจ่ายส่วนตัว ผ่าน LINE</p>
-          <p className="text-xs text-gray-300">v{APP_VERSION} · ทุกฟีเจอร์ใช้ฟรี</p>
+          <p className="text-base font-bold text-brand-600">{t.settings.appName}</p>
+          <p className="text-xs text-gray-400">{t.settings.appDesc}</p>
+          <p className="text-xs text-gray-300">v{APP_VERSION} · {t.settings.freeApp}</p>
         </div>
       </div>
     </div>

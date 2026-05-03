@@ -6,6 +6,7 @@ import type { Budget } from '@/types'
 import { CategoryIcon } from '@/components/shared/CategoryIcon'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { formatCurrency } from '@/lib/utils/currency'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
 interface BudgetCardProps {
   budget: Budget
@@ -14,8 +15,8 @@ interface BudgetCardProps {
 }
 
 export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
+  const { t, currencySymbol } = usePreferences()
   const spent = budget.spent ?? 0
-  const percent = Math.min(100, (spent / budget.amount) * 100)
   const remaining = budget.amount - spent
   const isOver = spent > budget.amount
 
@@ -30,10 +31,10 @@ export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
           />
           <div>
             <p className="text-sm font-semibold text-gray-800">
-              {budget.category?.name ?? 'ไม่ระบุ'}
+              {budget.category?.name ?? t.budgets.noCategory}
             </p>
             <p className="text-xs text-gray-400">
-              งบ {formatCurrency(budget.amount)}
+              {t.budgets.budgetLabel} {formatCurrency(budget.amount, false, currencySymbol)}
             </p>
           </div>
         </div>
@@ -53,14 +54,16 @@ export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
         </div>
       </div>
 
-      <ProgressBar value={spent} max={budget.amount} showLabel size="md" />
+      <ProgressBar value={spent} max={budget.amount} showLabel size="md" label={t.budgets.spent} />
 
       <div className="flex justify-between mt-2">
         <span className="text-xs text-gray-500">
-          ใช้ไป {formatCurrency(spent)}
+          {t.budgets.spent} {formatCurrency(spent, false, currencySymbol)}
         </span>
         <span className={`text-xs font-medium ${isOver ? 'text-red-500' : 'text-brand-600'}`}>
-          {isOver ? `เกิน ${formatCurrency(Math.abs(remaining))}` : `เหลือ ${formatCurrency(remaining)}`}
+          {isOver
+            ? `${t.budgets.over} ${formatCurrency(Math.abs(remaining), false, currencySymbol)}`
+            : `${t.budgets.remaining} ${formatCurrency(remaining, false, currencySymbol)}`}
         </span>
       </div>
     </div>

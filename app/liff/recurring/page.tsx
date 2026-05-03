@@ -20,6 +20,7 @@ import { formatDate } from '@/lib/utils/date'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
 const schema = z.object({
   type: z.enum(['income', 'expense']),
@@ -31,13 +32,6 @@ const schema = z.object({
 })
 
 type FormData = z.infer<typeof schema>
-
-const frequencyLabels: Record<string, string> = {
-  daily: 'รายวัน',
-  weekly: 'รายสัปดาห์',
-  monthly: 'รายเดือน',
-  yearly: 'รายปี',
-}
 
 function RecurringForm({
   categories,
@@ -52,6 +46,15 @@ function RecurringForm({
   defaultValues?: Partial<FormData>
   isEditing?: boolean
 }) {
+  const { t } = usePreferences()
+
+  const frequencyLabels: Record<string, string> = {
+    daily: t.recurring.daily,
+    weekly: t.recurring.weekly,
+    monthly: t.recurring.monthly,
+    yearly: t.recurring.yearly,
+  }
+
   const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -65,7 +68,7 @@ function RecurringForm({
   const activeType = watch('type')
   const filteredCats = categories.filter(c => c.type === activeType)
   const catOptions = [
-    { value: '', label: 'ไม่ระบุหมวดหมู่' },
+    { value: '', label: t.recurring.noCategory },
     ...filteredCats.map(c => ({ value: c.id, label: `${c.icon} ${c.name}` })),
   ]
   const freqOptions = Object.entries(frequencyLabels).map(([v, l]) => ({ value: v, label: l }))
@@ -73,31 +76,44 @@ function RecurringForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="flex bg-gray-100 rounded-2xl p-1 gap-1">
-        {(['expense', 'income'] as const).map(t => (
-          <button key={t} type="button" onClick={() => { setValue('type', t); setValue('category_id', '') }}
-            className={`flex-1 py-2 text-sm font-medium rounded-xl transition-all ${activeType === t ? 'bg-white shadow-sm text-brand-700' : 'text-gray-500'}`}>
-            {t === 'income' ? '+ รายรับ' : '- รายจ่าย'}
+        {(['expense', 'income'] as const).map(tp => (
+          <button key={tp} type="button" onClick={() => { setValue('type', tp); setValue('category_id', '') }}
+            className={`flex-1 py-2 text-sm font-medium rounded-xl transition-all ${activeType === tp ? 'bg-white shadow-sm text-brand-700' : 'text-gray-500'}`}>
+            {tp === 'income' ? t.recurring.incomeBtn : t.recurring.expenseBtn}
           </button>
         ))}
       </div>
 
-      <Input label="จำนวนเงิน (บาท)" type="number" step="0.01" min="0" inputMode="decimal"
-        leftAddon={<span className="text-sm">฿</span>} {...register('amount')}
-        error={errors.amount?.message} />
+      <Input
+        label={t.recurring.amountLabel}
+        type="number"
+        step="0.01"
+        min="0"
+        inputMode="decimal"
+        leftAddon={<span className="text-sm">฿</span>}
+        {...register('amount')}
+        error={errors.amount?.message}
+      />
 
-      <Select label="หมวดหมู่" options={catOptions} {...register('category_id')} />
+      <Select label={t.categories.title} options={catOptions} {...register('category_id')} />
 
-      <Input label="หมายเหตุ" placeholder="เช่น ค่าเช่าห้อง" {...register('note')} />
+      <Input label={t.recurring.noteLabel} placeholder={t.recurring.notePlaceholder} {...register('note')} />
 
-      <Select label="ความถี่" options={freqOptions} {...register('frequency')} />
+      <Select label={t.recurring.frequencyLabel} options={freqOptions} {...register('frequency')} />
 
-      <Input label="วันที่เริ่มต้น / ครั้งถัดไป" type="date" {...register('next_due_date')}
-        error={errors.next_due_date?.message} />
+      <Input
+        label={t.recurring.startDateLabel}
+        type="date"
+        {...register('next_due_date')}
+        error={errors.next_due_date?.message}
+      />
 
       <div className="flex gap-3 pt-2">
-        <Button type="button" variant="ghost" fullWidth onClick={onCancel}>ยกเลิก</Button>
+        <Button type="button" variant="ghost" fullWidth onClick={onCancel}>
+          {t.common.cancel}
+        </Button>
         <Button type="submit" fullWidth loading={isSubmitting}>
-          {isEditing ? 'บันทึก' : 'เพิ่มรายการประจำ'}
+          {isEditing ? t.recurring.saveBtn : t.recurring.addBtn}
         </Button>
       </div>
     </form>
@@ -105,6 +121,7 @@ function RecurringForm({
 }
 
 export default function RecurringPage() {
+  const { t } = usePreferences()
   const { profile } = useAuth()
   const { categories } = useCategories()
   const [items, setItems] = useState<RecurringTransaction[]>([])
@@ -112,6 +129,13 @@ export default function RecurringPage() {
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<RecurringTransaction | null>(null)
+
+  const frequencyLabels: Record<string, string> = {
+    daily: t.recurring.daily,
+    weekly: t.recurring.weekly,
+    monthly: t.recurring.monthly,
+    yearly: t.recurring.yearly,
+  }
 
   const fetchItems = useCallback(async () => {
     if (!profile) return
@@ -122,11 +146,11 @@ export default function RecurringPage() {
       const data = (await res.json()) as { data: RecurringTransaction[] }
       setItems(data.data)
     } catch {
-      setError('ไม่สามารถโหลดข้อมูลได้')
+      setError(t.recurring.loadError)
     } finally {
       setLoading(false)
     }
-  }, [profile])
+  }, [profile, t])
 
   useEffect(() => { fetchItems() }, [fetchItems])
 
@@ -169,7 +193,7 @@ export default function RecurringPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('ต้องการลบรายการประจำนี้?')) return
+    if (!confirm(t.recurring.deleteConfirm)) return
     await fetch(`/api/recurring/${id}`, { method: 'DELETE' })
     setItems(prev => prev.filter(i => i.id !== id))
   }
@@ -178,10 +202,10 @@ export default function RecurringPage() {
 
   return (
     <div className="page-container pt-0 space-y-3">
-      <Header title="รายการประจำ" rightAction={
+      <Header title={t.recurring.title} rightAction={
         <button onClick={() => setShowForm(true)}
           className="flex items-center gap-1 bg-brand-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl">
-          <Plus size={14} />เพิ่ม
+          <Plus size={14} />{t.recurring.add}
         </button>
       } />
 
@@ -199,9 +223,12 @@ export default function RecurringPage() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <EmptyState icon="🔄" title="ยังไม่มีรายการประจำ"
-            description="เพิ่มรายการที่เกิดซ้ำ เช่น ค่าเช่า เงินเดือน"
-            action={{ label: '+ เพิ่มรายการประจำ', onClick: () => setShowForm(true) }} />
+          <EmptyState
+            icon="🔄"
+            title={t.recurring.empty}
+            description={t.recurring.emptyDesc}
+            action={{ label: t.recurring.addFirst, onClick: () => setShowForm(true) }}
+          />
         ) : (
           <div className="space-y-3">
             {items.map(item => (
@@ -211,7 +238,7 @@ export default function RecurringPage() {
                     <CategoryIcon icon={item.category?.icon ?? '🔄'} color={item.category?.color ?? '#84a06e'} size="md" />
                     <div>
                       <p className="text-sm font-semibold text-gray-800">
-                        {item.category?.name ?? 'ไม่ระบุหมวดหมู่'}
+                        {item.category?.name ?? t.recurring.noCategory}
                       </p>
                       {item.note && <p className="text-xs text-gray-400">{item.note}</p>}
                       <div className="flex items-center gap-2 mt-1">
@@ -219,7 +246,7 @@ export default function RecurringPage() {
                           {frequencyLabels[item.frequency]}
                         </span>
                         <span className="text-xs text-gray-400">
-                          ครั้งถัดไป: {formatDate(item.next_due_date, 'd MMM')}
+                          {t.recurring.nextDue} {formatDate(item.next_due_date, 'd MMM')}
                         </span>
                       </div>
                     </div>
@@ -248,13 +275,16 @@ export default function RecurringPage() {
         )}
       </div>
 
-      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title="เพิ่มรายการประจำ">
+      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title={t.recurring.addTitle}>
         <RecurringForm categories={categories} onSubmit={handleCreate} onCancel={() => setShowForm(false)} />
       </Modal>
 
-      <Modal isOpen={!!editing} onClose={() => setEditing(null)} title="แก้ไขรายการประจำ">
+      <Modal isOpen={!!editing} onClose={() => setEditing(null)} title={t.recurring.editTitle}>
         {editing && (
-          <RecurringForm categories={categories} onSubmit={handleUpdate} onCancel={() => setEditing(null)}
+          <RecurringForm
+            categories={categories}
+            onSubmit={handleUpdate}
+            onCancel={() => setEditing(null)}
             defaultValues={{
               type: editing.type,
               amount: String(editing.amount),
@@ -263,7 +293,8 @@ export default function RecurringPage() {
               frequency: editing.frequency,
               next_due_date: editing.next_due_date,
             }}
-            isEditing />
+            isEditing
+          />
         )}
       </Modal>
     </div>

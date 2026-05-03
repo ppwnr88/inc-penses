@@ -6,7 +6,7 @@ export const MOCK_PROFILE: LiffProfile = {
   userId: 'demo_user_line_001',
   displayName: 'สมชาย ใจดี',
   pictureUrl: undefined,
-  statusMessage: 'กำลังทดสอบแอปเงินจด',
+  statusMessage: 'กำลังทดสอบแอปจด',
 }
 
 export async function fetchLiffProfile(): Promise<LiffProfile | null> {

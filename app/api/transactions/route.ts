@@ -95,3 +95,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  const { searchParams } = req.nextUrl
+  const profileId = searchParams.get('profile_id')
+  if (!profileId) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
+
+  const supabase = createServerClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let query: any = supabase.from('transactions').delete().eq('profile_id', profileId)
+
+  const dateFrom = searchParams.get('date_from')
+  if (dateFrom) query = query.gte('date', dateFrom)
+
+  const dateTo = searchParams.get('date_to')
+  if (dateTo) query = query.lte('date', dateTo)
+
+  const { error } = await query
+  if (error) {
+    console.error('[Transactions DELETE]', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ ok: true })
+}

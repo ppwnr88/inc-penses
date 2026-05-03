@@ -8,6 +8,7 @@ const updateSchema = z.object({
   notify_daily: z.boolean().optional(),
   notify_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).optional(),
   timezone: z.string().optional(),
+  lang: z.string().max(5).optional(),
 })
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

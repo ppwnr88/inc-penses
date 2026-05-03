@@ -5,16 +5,18 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, List, BarChart2, Settings } from 'lucide-react'
 import { twMerge } from 'tailwind-merge'
-
-const navItems = [
-  { href: '/liff', label: 'หน้าหลัก', icon: Home },
-  { href: '/liff/transactions', label: 'รายการ', icon: List },
-  { href: '/liff/reports', label: 'รายงาน', icon: BarChart2 },
-  { href: '/liff/settings', label: 'ตั้งค่า', icon: Settings },
-]
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
 export function BottomNav() {
   const pathname = usePathname()
+  const { t } = usePreferences()
+
+  const navItems = [
+    { href: '/liff', label: t.nav.dashboard, icon: Home },
+    { href: '/liff/transactions', label: t.nav.transactions, icon: List },
+    { href: '/liff/reports', label: t.nav.reports, icon: BarChart2 },
+    { href: '/liff/settings', label: t.nav.settings, icon: Settings },
+  ]
 
   return (
     <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 safe-area-pb z-40">

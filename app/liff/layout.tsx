@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { LiffProvider } from '@/features/auth/LiffProvider'
+import { PreferencesProvider } from '@/lib/i18n/PreferencesContext'
 import { BottomNav } from '@/components/layout/BottomNav'
 
 const PAGE_MAP: Record<string, string> = {
@@ -32,12 +33,14 @@ function PageRouter({ children }: { children: React.ReactNode }) {
 export default function LiffLayout({ children }: { children: React.ReactNode }) {
   return (
     <LiffProvider>
-      <div className="min-h-screen bg-cream-50">
-        <React.Suspense fallback={null}>
-          <PageRouter>{children}</PageRouter>
-        </React.Suspense>
-        <BottomNav />
-      </div>
+      <PreferencesProvider>
+        <div className="min-h-screen bg-cream-50 safe-area-pt">
+          <React.Suspense fallback={null}>
+            <PageRouter>{children}</PageRouter>
+          </React.Suspense>
+          <BottomNav />
+        </div>
+      </PreferencesProvider>
     </LiffProvider>
   )
 }

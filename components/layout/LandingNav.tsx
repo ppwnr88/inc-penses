@@ -12,7 +12,7 @@ export function LandingNav() {
     <header className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-md border-b border-sand-100">
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold text-brand-700">
-          เงินจด
+          จด
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">

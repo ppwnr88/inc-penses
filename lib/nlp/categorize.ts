@@ -28,7 +28,7 @@ const EXPENSE_RULES: CategoryRule[] = [
     ],
   },
   {
-    name: 'ที่พัก',
+    name: 'ค่าเช่า',
     keywords: [
       'ค่าเช่า','เช่าห้อง','เช่า','ที่พัก','โรงแรม','hotel','airbnb',
       'หอพัก','คอนโด','อพาร์ทเมนต์','อพาร์ตเมนต์','บ้าน','ห้อง',
@@ -84,15 +84,15 @@ const INCOME_RULES: CategoryRule[] = [
     keywords: ['เงินเดือน','salary','โบนัส','bonus','ค่าจ้าง','เงินปลายเดือน'],
   },
   {
-    name: 'ลงทุน/ปันผล',
+    name: 'ลงทุน',
     keywords: ['ปันผล','dividend','กองทุน','หุ้น','crypto','ดอกเบี้ย','ssf','rmf','ลงทุน'],
   },
   {
-    name: 'ฟรีแลนซ์',
+    name: 'อื่นๆ (รับ)',
     keywords: ['freelance','ฟรีแลนซ์','รับงาน','งาน','project','ค่างาน','ออกแบบ','เว็บ','โปรแกรม'],
   },
   {
-    name: 'รายได้อื่นๆ',
+    name: 'อื่นๆ (รับ)',
     keywords: ['ขายของ','ขาย','shopee','lazada','facebook','รับเงิน','ได้รับ','รางวัล'],
   },
 ]
@@ -107,5 +107,5 @@ export function suggestCategory(note: string, type: TransactionType): string {
     }
   }
 
-  return type === 'expense' ? 'อื่นๆ' : 'รายได้อื่นๆ'
+  return type === 'expense' ? 'อื่นๆ (จ่าย)' : 'อื่นๆ (รับ)'
 }

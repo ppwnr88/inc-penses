@@ -13,8 +13,10 @@ import { useBudgets } from '@/features/budgets/useBudgets'
 import { useCategories } from '@/features/categories/useCategories'
 import { getThaiMonthName } from '@/lib/utils/date'
 import type { Budget } from '@/types'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
 export default function BudgetsPage() {
+  const { t, lang } = usePreferences()
   const { budgets, loading, error, refetch, createBudget, updateBudget, deleteBudget, month, year } = useBudgets()
   const { categories } = useCategories()
   const [showForm, setShowForm] = useState(false)
@@ -32,9 +34,13 @@ export default function BudgetsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('ต้องการลบงบประมาณนี้?')) return
+    if (!confirm(t.budgets.deleteConfirm)) return
     await deleteBudget(id)
   }
+
+  const monthDisplay = lang === 'th'
+    ? `${getThaiMonthName(month)} ${year + 543}`
+    : `${new Date(year, month - 1, 1).toLocaleDateString('en-US', { month: 'long' })} ${year}`
 
   if (error) {
     return <ErrorState message={error} onRetry={refetch} />
@@ -43,24 +49,22 @@ export default function BudgetsPage() {
   return (
     <div className="page-container pt-0 space-y-3">
       <Header
-        title="งบประมาณ"
+        title={t.budgets.title}
         rightAction={
           <button
             onClick={() => setShowForm(true)}
             className="flex items-center gap-1 bg-brand-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl"
           >
             <Plus size={14} />
-            เพิ่ม
+            {t.budgets.add}
           </button>
         }
       />
 
       <div className="pt-3 space-y-3">
         <div className="flex items-center justify-between px-1">
-          <p className="text-sm font-semibold text-gray-700">
-            {getThaiMonthName(month)} {year + 543}
-          </p>
-          <span className="text-xs text-gray-400">{budgets.length} รายการ</span>
+          <p className="text-sm font-semibold text-gray-700">{monthDisplay}</p>
+          <span className="text-xs text-gray-400">{budgets.length} {t.budgets.count}</span>
         </div>
 
         {loading ? (
@@ -75,9 +79,9 @@ export default function BudgetsPage() {
         ) : budgets.length === 0 ? (
           <EmptyState
             icon="🎯"
-            title="ยังไม่มีงบประมาณ"
-            description="ตั้งงบประมาณต่อหมวดหมู่เพื่อควบคุมการใช้จ่าย"
-            action={{ label: '+ ตั้งงบประมาณ', onClick: () => setShowForm(true) }}
+            title={t.budgets.empty}
+            description={t.budgets.emptyDesc}
+            action={{ label: t.budgets.addBudget, onClick: () => setShowForm(true) }}
           />
         ) : (
           <div className="space-y-3">
@@ -93,7 +97,7 @@ export default function BudgetsPage() {
         )}
       </div>
 
-      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title="ตั้งงบประมาณ">
+      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title={t.budgets.addTitle}>
         <BudgetForm
           categories={categories}
           month={month}
@@ -106,7 +110,7 @@ export default function BudgetsPage() {
       <Modal
         isOpen={!!editingBudget}
         onClose={() => setEditingBudget(null)}
-        title="แก้ไขงบประมาณ"
+        title={t.budgets.editTitle}
       >
         {editingBudget && (
           <BudgetForm

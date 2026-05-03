@@ -11,8 +11,10 @@ import { useTransactions } from '@/features/transactions/useTransactions'
 import { useCategories } from '@/features/categories/useCategories'
 import { getCurrentMonthYear } from '@/lib/utils/date'
 import type { Transaction } from '@/types'
+import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
 export default function TransactionsPage() {
+  const { t } = usePreferences()
   const { month, year } = getCurrentMonthYear()
   const [showForm, setShowForm] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
@@ -48,13 +50,13 @@ export default function TransactionsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('ต้องการลบรายการนี้?')) return
+    if (!confirm(t.transactions.deleteConfirm)) return
     await deleteTransaction(id)
   }
 
   return (
     <div className="page-container pt-0 space-y-3">
-      <Header title="รายการทั้งหมด" />
+      <Header title={t.transactions.title} />
 
       <div className="pt-3 space-y-3">
         <TransactionFilters
@@ -74,7 +76,7 @@ export default function TransactionsPage() {
           loading={loading}
           onDelete={handleDelete}
           onEdit={setEditingTransaction}
-          emptyMessage="ไม่พบรายการ"
+          emptyMessage={t.transactions.empty}
         />
       </div>
 
@@ -87,7 +89,7 @@ export default function TransactionsPage() {
       </button>
 
       {/* Create Modal */}
-      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title="บันทึกรายการ">
+      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title={t.transactions.addTitle}>
         <TransactionForm
           categories={categories}
           onSubmit={handleCreate}
@@ -99,7 +101,7 @@ export default function TransactionsPage() {
       <Modal
         isOpen={!!editingTransaction}
         onClose={() => setEditingTransaction(null)}
-        title="แก้ไขรายการ"
+        title={t.transactions.editTitle}
       >
         {editingTransaction && (
           <TransactionForm

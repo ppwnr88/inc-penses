@@ -24,7 +24,7 @@
 
 @layer utilities {
   .safe-area-pb {
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: max(env(safe-area-inset-bottom), 8px);
   }
 
   .safe-area-pt {
@@ -32,7 +32,7 @@
   }
 
   .page-container {
-    @apply max-w-lg mx-auto px-4 pb-24;
+    @apply max-w-lg mx-auto px-4 pb-28;
   }
 
   .section-title {
