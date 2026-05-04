@@ -237,7 +237,14 @@ export function transactionConfirmedFlex(opts: {
           {
             type: 'box' as const,
             layout: 'horizontal' as const,
-            paddingTop: '2px',
+            backgroundColor: '#ffffff',
+            cornerRadius: '8px',
+            paddingTop: '5px',
+            paddingBottom: '5px',
+            paddingStart: '8px',
+            paddingEnd: '8px',
+            margin: 'xs' as const,
+            alignItems: 'center' as const,
             contents: [
               {
                 type: 'text' as const,
@@ -245,7 +252,15 @@ export function transactionConfirmedFlex(opts: {
                 size: 'xxs' as const,
                 color: '#4a7c59',
                 flex: 1,
-                align: 'center' as const,
+                align: 'end' as const,
+              },
+              {
+                type: 'text' as const,
+                text: '•',
+                size: 'xxs' as const,
+                color: '#cccccc',
+                flex: 0,
+                margin: 'md' as const,
               },
               {
                 type: 'text' as const,
@@ -253,7 +268,8 @@ export function transactionConfirmedFlex(opts: {
                 size: 'xxs' as const,
                 color: '#d9526b',
                 flex: 1,
-                align: 'center' as const,
+                align: 'start' as const,
+                margin: 'md' as const,
               },
             ],
           },
