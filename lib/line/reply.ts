@@ -219,31 +219,6 @@ export function transactionConfirmedFlex(opts: {
           {
             type: 'box' as const,
             layout: 'horizontal' as const,
-            paddingBottom: '3px',
-            margin: 'xs' as const,
-            alignItems: 'center' as const,
-            contents: [
-              {
-                type: 'text' as const,
-                text: `${incomeTotalLabel}: ${totalIncome}`,
-                size: 'xxs' as const,
-                color: '#4a7c59',
-                flex: 1,
-                align: 'center' as const,
-              },
-              {
-                type: 'text' as const,
-                text: `${expenseTotalLabel}: ${totalExpense}`,
-                size: 'xxs' as const,
-                color: '#d9526b',
-                flex: 1,
-                align: 'center' as const,
-              },
-            ],
-          },
-          {
-            type: 'box' as const,
-            layout: 'horizontal' as const,
             spacing: 'md' as const,
             contents: [
               actionBox(fa('trash-can', 'ffffff'), cancelLabel, '#e8837a', {
@@ -256,7 +231,33 @@ export function transactionConfirmedFlex(opts: {
                 type: 'uri',
                 label: summaryLabel,
                 uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}`,
-              }, 2),
+              }, 1),
+            ],
+          },
+          {
+            type: 'box' as const,
+            layout: 'horizontal' as const,
+            paddingTop: '3px',
+            margin: 'xs' as const,
+            alignItems: 'center' as const,
+            contents: [
+              {
+                type: 'text' as const,
+                text: `${incomeTotalLabel}: ${totalIncome}`,
+                size: 'xxs' as const,
+                color: '#4a7c59',
+                flex: 1,
+                align: 'end' as const,
+              },
+              {
+                type: 'text' as const,
+                text: `${expenseTotalLabel}: ${totalExpense}`,
+                size: 'xxs' as const,
+                color: '#d9526b',
+                flex: 1,
+                align: 'start' as const,
+                margin: 'lg' as const,
+              },
             ],
           },
         ],
