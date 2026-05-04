@@ -247,7 +247,7 @@ export function transactionConfirmedFlex(opts: {
                 size: 'xxs' as const,
                 color: '#4a7c59',
                 flex: 1,
-                align: 'end' as const,
+                align: 'start' as const,
               },
               {
                 type: 'text' as const,
