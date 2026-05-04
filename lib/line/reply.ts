@@ -221,16 +221,16 @@ export function transactionConfirmedFlex(opts: {
             layout: 'horizontal' as const,
             spacing: 'md' as const,
             contents: [
+              actionBox(fa('circle-check', 'ffffff'), summaryLabel, '#6b8f5e', {
+                type: 'uri',
+                label: summaryLabel,
+                uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}`,
+              }, 1),
               actionBox(fa('trash-can', 'ffffff'), cancelLabel, '#e8837a', {
                 type: 'postback',
                 label: cancelLabel,
                 data: `action=delete_tx&id=${opts.transactionId}`,
                 displayText: cancelDisplayText,
-              }, 1),
-              actionBox(fa('circle-check', 'ffffff'), summaryLabel, '#6b8f5e', {
-                type: 'uri',
-                label: summaryLabel,
-                uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}`,
               }, 1),
             ],
           },
