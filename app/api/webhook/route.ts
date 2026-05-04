@@ -175,6 +175,9 @@ async function handleTextMessage(event: LineTextEvent) {
   }
   console.log('[tx] inserted:', tx.id)
 
+  const txDate = parsed.date ?? new Date().toISOString().split('T')[0]
+  const totals = await getMonthlyTotals(supabase, profile.id, txDate)
+
   await replyMessage(replyToken, [
     transactionConfirmedFlex({
       type: parsed.type,
@@ -182,8 +185,10 @@ async function handleTextMessage(event: LineTextEvent) {
       note: parsed.note,
       category: category?.name ?? categoryName,
       transactionId: tx.id,
-      date: parsed.date ?? new Date().toISOString().split('T')[0],
+      date: txDate,
       lang,
+      totalIncome: totals.totalIncome,
+      totalExpense: totals.totalExpense,
     }),
   ])
   console.log('[tx] reply sent')
@@ -237,6 +242,8 @@ async function handleImageMessage(event: LineImageEvent) {
       return
     }
 
+    const totals = await getMonthlyTotals(supabase, profile.id, slip.date ?? today)
+
     await replyMessage(replyToken, [
       transactionConfirmedFlex({
         type: 'expense',
@@ -246,6 +253,8 @@ async function handleImageMessage(event: LineImageEvent) {
         transactionId: tx.id,
         date: slip.date ?? today,
         lang,
+        totalIncome: totals.totalIncome,
+        totalExpense: totals.totalExpense,
       }),
     ])
   } catch (err) {
@@ -408,4 +417,37 @@ async function sendSummary(userId: string, replyToken: string) {
       lang,
     }),
   ])
+}
+
+async function getMonthlyTotals(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  profileId: string,
+  date: string,
+): Promise<{ totalIncome: number; totalExpense: number }> {
+  const year = Number(date.slice(0, 4))
+  const month = Number(date.slice(5, 7))
+  const from = `${year}-${String(month).padStart(2, '0')}-01`
+  const lastDay = new Date(year, month, 0).getDate()
+  const to = `${year}-${String(month).padStart(2, '0')}-${lastDay}`
+
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('type, amount')
+    .eq('profile_id', profileId)
+    .gte('date', from)
+    .lte('date', to)
+
+  if (error) {
+    console.log('[tx] totals error:', error.message)
+    return { totalIncome: 0, totalExpense: 0 }
+  }
+
+  const txs = data ?? []
+  return {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    totalIncome: txs.filter((t: any) => t.type === 'income').reduce((sum: number, t: any) => sum + Number(t.amount), 0),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    totalExpense: txs.filter((t: any) => t.type === 'expense').reduce((sum: number, t: any) => sum + Number(t.amount), 0),
+  }
 }

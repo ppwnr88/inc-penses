@@ -40,6 +40,8 @@ export function transactionConfirmedFlex(opts: {
   transactionId: string
   date?: string  // YYYY-MM-DD
   lang?: string
+  totalIncome?: number
+  totalExpense?: number
 }) {
   const isIncome  = opts.type === 'income'
   const isEn      = opts.lang === 'en'
@@ -69,6 +71,10 @@ export function transactionConfirmedFlex(opts: {
   const cancelLabel = isEn ? 'Cancel' : 'ยกเลิก'
   const summaryLabel = isEn ? 'Summary' : 'ดูสรุป'
   const cancelDisplayText = isEn ? 'Cancel last item' : 'ยกเลิกรายการล่าสุด'
+  const incomeTotalLabel = isEn ? 'Income' : 'รวมรับ'
+  const expenseTotalLabel = isEn ? 'Expense' : 'รวมจ่าย'
+  const totalIncome = (opts.totalIncome ?? 0).toLocaleString('th-TH', { minimumFractionDigits: 0 })
+  const totalExpense = (opts.totalExpense ?? 0).toLocaleString('th-TH', { minimumFractionDigits: 0 })
 
   // Font Awesome 6 icons served as PNG from own API route
   const fa = (name: string, color: string) =>
@@ -204,23 +210,53 @@ export function transactionConfirmedFlex(opts: {
       },
       footer: {
         type: 'box',
-        layout: 'horizontal' as const,
-        spacing: 'md' as const,
+        layout: 'vertical' as const,
+        spacing: 'xs' as const,
         backgroundColor: '#f5f5f5',
         paddingAll: '10px',
         paddingTop: '4px',
         contents: [
-          actionBox(fa('trash-can', 'ffffff'), cancelLabel, '#e8837a', {
-            type: 'postback',
-            label: cancelLabel,
-            data: `action=delete_tx&id=${opts.transactionId}`,
-            displayText: cancelDisplayText,
-          }, 1),
-          actionBox(fa('circle-check', 'ffffff'), summaryLabel, '#6b8f5e', {
-            type: 'uri',
-            label: summaryLabel,
-            uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}`,
-          }, 2),
+          {
+            type: 'box' as const,
+            layout: 'horizontal' as const,
+            spacing: 'md' as const,
+            contents: [
+              actionBox(fa('trash-can', 'ffffff'), cancelLabel, '#e8837a', {
+                type: 'postback',
+                label: cancelLabel,
+                data: `action=delete_tx&id=${opts.transactionId}`,
+                displayText: cancelDisplayText,
+              }, 1),
+              actionBox(fa('circle-check', 'ffffff'), summaryLabel, '#6b8f5e', {
+                type: 'uri',
+                label: summaryLabel,
+                uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}`,
+              }, 2),
+            ],
+          },
+          {
+            type: 'box' as const,
+            layout: 'horizontal' as const,
+            paddingTop: '2px',
+            contents: [
+              {
+                type: 'text' as const,
+                text: `${incomeTotalLabel}: ${totalIncome}`,
+                size: 'xxs' as const,
+                color: '#4a7c59',
+                flex: 1,
+                align: 'center' as const,
+              },
+              {
+                type: 'text' as const,
+                text: `${expenseTotalLabel}: ${totalExpense}`,
+                size: 'xxs' as const,
+                color: '#d9526b',
+                flex: 1,
+                align: 'center' as const,
+              },
+            ],
+          },
         ],
       },
     },
