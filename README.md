@@ -1,52 +1,86 @@
 # เงินจด (Ngern Jod)
 
-ผู้ช่วยจดรายรับรายจ่ายส่วนตัว ผ่าน LINE — ง่าย เร็ว ไม่ยุ่งยาก
+ผู้ช่วยจดรายรับรายจ่ายส่วนตัวผ่าน LINE สำหรับบันทึกรายการเร็ว ๆ ดูรายงาน ตั้งงบประมาณ และรับสรุปรายเดือนเป็นไฟล์ Excel ทางอีเมล
 
 ## Overview
 
-เงินจด is a personal finance tracking app built as a LINE LIFF (LINE Front-end Framework) application. Users can log income and expenses, set budgets, view reports with charts, and export data — all from within LINE.
+เงินจด is a mobile-first personal finance tracker built as a LINE LIFF app. Users can record income and expenses from LINE text messages, manage categories and budgets, view monthly reports, export data, scan payment slips, and opt in to an automatic previous-month email summary.
 
-**Design**: Warm, friendly, mobile-first — earth tones (olive/sage/moss/sand/cream)
+**Design**: warm, friendly, mobile-first UI with earth-tone accents.
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript (strict) |
+| Framework | Next.js 16 App Router |
+| Language | TypeScript |
 | Styling | Tailwind CSS 3 |
-| Database | Supabase (PostgreSQL) |
-| Auth | LINE LIFF SDK |
-| Forms | react-hook-form + Zod |
-| Charts | recharts |
-| Date utils | date-fns |
+| Database | Supabase PostgreSQL |
+| Auth | LINE LIFF profile auth |
+| Messaging | LINE Messaging API webhook |
+| Email | Resend |
+| Scheduled jobs | Vercel Cron |
+| AI OCR | Gemini 2.5 Flash Lite |
+| Charts | Recharts |
 | Export | xlsx |
 | Icons | lucide-react |
 
+## Features
+
+| Feature | Status |
+|---|---|
+| LINE LIFF app with mock-mode development | Done |
+| LINE webhook text entry | Done |
+| Thai natural text parsing, including `วันที่ N` | Done |
+| Auto category from keyword rules | Done |
+| LINE Flex confirmation card with monthly totals | Done |
+| Undo latest transaction from LINE | Done |
+| Monthly summary command from LINE | Done |
+| Payment slip image OCR with Gemini | Done |
+| Manual transaction CRUD | Done |
+| Category management | Done |
+| Budget tracking | Done |
+| Recurring transactions | Done |
+| Monthly reports with charts | Done |
+| CSV export | Done |
+| Excel export | Done |
+| Automatic previous-month email summary with Excel attachment | Done |
+| Daily LINE reminders | Scaffold / not wired |
+| Voice input | Scaffold / not wired |
+
 ## Project Structure
 
-```
+```text
 app/
-├── page.tsx              # Landing page (public)
-├── features/page.tsx     # Features showcase (public)
-├── liff/                 # LIFF app (LINE auth required)
-│   ├── layout.tsx        # LiffProvider + BottomNav wrapper
-│   ├── page.tsx          # Dashboard
-│   ├── transactions/     # Transaction list & management
-│   ├── categories/       # Category management
-│   ├── budgets/          # Budget tracking
-│   ├── reports/          # Monthly reports + charts
-│   ├── recurring/        # Recurring transactions
-│   └── settings/         # User settings & export
-└── api/                  # API routes (server-side Supabase)
-    ├── auth/line/        # LINE auth + profile upsert
-    ├── transactions/     # CRUD
-    ├── categories/       # CRUD
-    ├── budgets/          # CRUD + spent calculation
-    ├── reports/          # Monthly aggregation
-    ├── recurring/        # CRUD
-    ├── profiles/         # Profile settings
-    └── export/           # CSV + Excel download
+├── page.tsx                 # Landing page
+├── features/page.tsx        # Public feature page
+├── liff/                    # LIFF app screens
+│   ├── page.tsx             # Dashboard
+│   ├── transactions/        # Transaction list and edit flow
+│   ├── categories/          # Category management
+│   ├── budgets/             # Budgets
+│   ├── reports/             # Monthly reports and exports
+│   ├── recurring/           # Recurring transactions
+│   └── settings/            # Settings, export, email summary opt-in
+└── api/
+    ├── auth/line/           # LINE profile upsert
+    ├── webhook/             # LINE Messaging webhook
+    ├── cron/monthly-summary # Vercel Cron email job
+    ├── export/              # CSV/Excel download
+    ├── reports/             # Monthly aggregation
+    ├── transactions/        # Transaction CRUD
+    ├── categories/          # Category CRUD
+    ├── budgets/             # Budget CRUD
+    ├── recurring/           # Recurring CRUD
+    └── profiles/            # Profile settings
+
+lib/
+├── ai/gemini.ts             # Payment slip OCR
+├── email/monthly-summary.ts # Email summary and Excel attachment
+├── line/reply.ts            # LINE reply/push/Flex messages
+├── nlp/                     # Parser and category keyword rules
+├── export/                  # Client-side export helpers
+└── supabase/                # Supabase clients
 ```
 
 ## Environment Variables
@@ -55,140 +89,160 @@ app/
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Yes |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/publishable key | Yes |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key for server-side jobs/webhooks | Yes |
-| `NEXT_PUBLIC_LIFF_ID` | LINE LIFF ID from LINE Developers | Yes (for production) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase secret/service key for server routes, webhooks, and cron jobs | Yes |
+| `NEXT_PUBLIC_LIFF_ID` | LINE LIFF ID | Yes in production |
 | `NEXT_PUBLIC_APP_URL` | App base URL | Yes |
-| `RESEND_API_KEY` | Resend API key for monthly summary emails | Yes (for email summaries) |
-| `EMAIL_FROM` | Verified sender email, e.g. `noreply@wannarat.cc` | Yes (for email summaries) |
-| `CRON_SECRET` | Secret used to protect scheduled cron endpoints | Yes (for scheduled jobs) |
+| `LINE_CHANNEL_ACCESS_TOKEN` | LINE Messaging API token for profile fetch, image download, reply, and push | Yes for LINE bot |
+| `LINE_CHANNEL_SECRET` | LINE Messaging API channel secret for webhook signature verification | Yes for LINE bot |
+| `GEMINI_API_KEY` | Gemini API key for payment slip OCR | Yes for OCR |
+| `RESEND_API_KEY` | Resend API key for monthly summary emails | Yes for email summary |
+| `EMAIL_FROM` | Verified sender email, e.g. `noreply@wannarat.cc` | Yes for email summary |
+| `CRON_SECRET` | Secret used by Vercel Cron Authorization header | Yes for scheduled jobs |
+
+Do not commit real secrets. Put them in `.env.local` for local development and Vercel Environment Variables for production.
 
 ## Setup
 
-### 1. Install dependencies
+### 1. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Configure environment variables
-
-Copy `.env.example` to `.env.local` and fill in the values:
+### 2. Configure Environment Variables
 
 ```bash
 cp .env.example .env.local
 ```
 
-### 3. Set up the database
+Fill in the required values. For production, set the same values in Vercel.
 
-Run the migration in your Supabase dashboard (SQL Editor):
+### 3. Set Up Database
 
-```bash
-# Copy and run in Supabase SQL Editor:
-supabase/migrations/001_initial_schema.sql
+Run migrations in Supabase SQL Editor in order:
+
+```sql
+-- 1. Initial schema
+-- Copy and run:
+-- supabase/migrations/001_initial_schema.sql
+
+-- 2. Monthly email summary settings
+-- Copy and run:
+-- supabase/migrations/002_monthly_summary_email.sql
 ```
 
-Run additional migrations in order when present:
+Optional seed data for local/dev:
 
-```bash
-supabase/migrations/002_monthly_summary_email.sql
+```sql
+-- supabase/seed.sql
 ```
 
-Optionally run seed data for development:
+### 4. Set Up LINE LIFF
 
-```bash
-# Copy and run in Supabase SQL Editor:
-supabase/seed.sql
+1. Create a LINE Login channel in LINE Developers.
+2. Add a LIFF app.
+3. Set endpoint URL to `https://your-domain.com/liff`.
+4. Enable scopes `profile` and `openid`.
+5. Put the LIFF ID in `NEXT_PUBLIC_LIFF_ID`.
+
+If `NEXT_PUBLIC_LIFF_ID` is missing or set to `YOUR_LIFF_ID_HERE`, the app runs in mock mode for local development.
+
+### 5. Set Up LINE Messaging Webhook
+
+1. Create or connect a LINE Messaging API channel.
+2. Set webhook URL to:
+
+```text
+https://your-domain.com/api/webhook
 ```
 
-### 4. Set up LINE LIFF
+3. Set `LINE_CHANNEL_ACCESS_TOKEN`.
+4. Set `LINE_CHANNEL_SECRET`.
+5. Enable webhook in LINE Developers.
 
-1. Go to [LINE Developers Console](https://developers.line.biz/)
-2. Create a new provider (or use existing)
-3. Create a new channel → **LINE Login**
-4. Under the channel, go to **LIFF** tab
-5. Add a new LIFF app:
-   - **Size**: Full
-   - **Endpoint URL**: `https://your-domain.com/liff` (or `http://localhost:3000/liff` for dev)
-   - **Scopes**: `profile`, `openid`
-   - **Bot link feature**: Off (or as needed)
-6. Copy the **LIFF ID** and set it in `.env.local`:
-   ```
-   NEXT_PUBLIC_LIFF_ID=1234567890-abcdefgh
-   ```
+## Monthly Email Summary
 
-> **Development note**: If `NEXT_PUBLIC_LIFF_ID` is missing or set to `YOUR_LIFF_ID_HERE`, the app runs in **mock mode** — it will use a fake user profile and skip LINE authentication. This lets you develop and test without a real LIFF ID.
+Users can enable automatic previous-month summaries in `Settings`. When enabled, the profile must have an email address.
 
-### 5. Run development server
+The system sends every 1st day of the month at 08:00 Asia/Bangkok. Vercel Cron uses UTC, so the production schedule is:
+
+```json
+{
+  "path": "/api/cron/monthly-summary",
+  "schedule": "0 1 1 * *"
+}
+```
+
+The email is sent with Resend from `EMAIL_FROM`, and includes an Excel attachment containing:
+
+- previous month label, e.g. `เมษายน 2569`
+- total income
+- total expense
+- net balance
+- transaction count
+- category breakdown
+- transaction list
+
+Operational checklist:
+
+1. Verify the sending domain in Resend.
+2. Set `EMAIL_FROM=noreply@wannarat.cc` or another verified sender.
+3. Set `RESEND_API_KEY`.
+4. Set `CRON_SECRET`.
+5. Deploy `vercel.json`.
+6. Check Vercel Project Settings → Cron Jobs after deployment.
+
+`CRON_SECRET` is compared against the `Authorization: Bearer <CRON_SECRET>` header. Vercel sends this automatically when the environment variable exists.
+
+## Common Commands
 
 ```bash
 npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) for the landing page.
-Open [http://localhost:3000/liff](http://localhost:3000/liff) for the app (mock mode).
-
-## Build for Production
-
-```bash
 npm run build
-npm start
+npm run type-check
 ```
 
-## Features
+Note: `npm run lint` currently uses `next lint`, which is no longer valid for this Next.js version. Update the lint script before relying on it in CI.
 
-| Feature | Status |
-|---|---|
-| Manual transaction entry | Done |
-| Category management | Done |
-| Budget tracking with progress bars | Done |
-| Monthly reports with pie + bar charts | Done |
-| Recurring transactions | Done |
-| CSV export | Done |
-| Excel export | Done |
-| LINE LIFF authentication | Done |
-| Receipt scanning (OCR) | Scaffold — needs real OCR API |
-| Voice input | Scaffold — needs Web Speech API / Whisper |
-| Daily push notifications | Scaffold — needs LINE Messaging API |
+## Development URLs
 
-## TODO (Real Integrations)
-
-### OCR Receipt Scanning
-File: `lib/mock/ocr.ts`
-- Integrate with **Google Cloud Vision API**, **AWS Textract**, or **Thai OCR** service
-- Replace `processReceiptImage()` implementation
-
-### Voice Input
-File: `lib/mock/speech.ts`
-- Integrate with **Web Speech API** (built-in browser) for Thai language
-- Or integrate with **OpenAI Whisper API** for better Thai support
-
-### LINE LIFF ID
-- Register at LINE Developers Console
-- Set `NEXT_PUBLIC_LIFF_ID` in `.env.local`
-
-### LINE Daily Notifications
-- Set up **LINE Messaging API** channel
-- Build a cron job / Edge Function to push daily reminders
-
-### Row-Level Security (RLS)
-The current RLS policies are open (allow all). To properly secure data:
-- Implement JWT-based auth by passing LINE userId through Supabase custom claims
-- Or use a server-side session approach
+```text
+Landing page: http://localhost:3000
+LIFF app:     http://localhost:3000/liff
+```
 
 ## Database Schema
 
-See `supabase/migrations/001_initial_schema.sql` for the complete schema.
-
 Main tables:
-- `profiles` — LINE user profiles
-- `categories` — Income/expense categories per user
-- `transactions` — All transactions
-- `budgets` — Monthly budgets per category
-- `recurring_transactions` — Recurring income/expenses
-- `monthly_reports` — Aggregated monthly summaries
-- `reminders` — Notification settings
-- `attachments` — Receipt/document attachments
-- `usage_logs` — Analytics
+
+- `profiles` — LINE user profiles, preferences, email, monthly summary opt-in
+- `categories` — income/expense categories per user
+- `transactions` — all income/expense records
+- `budgets` — monthly budgets per category
+- `recurring_transactions` — recurring income/expense templates
+- `monthly_reports` — aggregated monthly summaries
+- `reminders` — notification settings
+- `attachments` — receipt/document metadata
+- `usage_logs` — analytics and monthly email send logs
+
+See:
+
+- `supabase/migrations/001_initial_schema.sql`
+- `supabase/migrations/002_monthly_summary_email.sql`
+
+## Security Notes
+
+- `SUPABASE_SERVICE_ROLE_KEY` / Supabase secret key must only be used server-side.
+- `RESEND_API_KEY`, `LINE_CHANNEL_ACCESS_TOKEN`, `LINE_CHANNEL_SECRET`, `GEMINI_API_KEY`, and `CRON_SECRET` must never be committed.
+- Current Supabase RLS policies in the initial migration are permissive for app-level auth. Tighten these before handling sensitive multi-user production data outside trusted server routes.
+- Vercel Cron endpoint is protected by `CRON_SECRET`.
+
+## TODO
+
+- Replace deprecated `next lint` script with an ESLint command compatible with the current Next.js version.
+- Tighten Supabase RLS policies.
+- Wire daily LINE reminders if still needed.
+- Wire voice input if still needed.
 
 ## License
 
