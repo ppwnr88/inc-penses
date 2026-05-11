@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Download, Bell, Calendar, User, Trash2 } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { Download, Bell, Calendar, User, Trash2, Mail } from 'lucide-react'
 import { Header } from '@/components/layout/Header'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -17,6 +17,8 @@ export default function SettingsPage() {
   const [budgetDay, setBudgetDay] = useState(profile?.budget_cycle_day ?? 1)
   const [notifyEnabled, setNotifyEnabled] = useState(profile?.notify_daily ?? true)
   const [notifyTime, setNotifyTime] = useState(profile?.notify_time ?? '20:00')
+  const [monthlySummaryEnabled, setMonthlySummaryEnabled] = useState(profile?.monthly_summary_email_enabled ?? false)
+  const [email, setEmail] = useState(profile?.email ?? '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [deleteFrom, setDeleteFrom] = useState('')
@@ -25,8 +27,21 @@ export default function SettingsPage() {
   const [deleteMsg, setDeleteMsg] = useState('')
   const [showDeleteAll, setShowDeleteAll] = useState(false)
 
+  useEffect(() => {
+    if (!profile) return
+    setBudgetDay(profile.budget_cycle_day ?? 1)
+    setNotifyEnabled(profile.notify_daily ?? true)
+    setNotifyTime(profile.notify_time ?? '20:00')
+    setMonthlySummaryEnabled(profile.monthly_summary_email_enabled ?? false)
+    setEmail(profile.email ?? '')
+  }, [profile])
+
   async function handleSave() {
     if (!profile) return
+    if (monthlySummaryEnabled && !email.trim()) {
+      alert(t.settings.monthlySummaryEmailRequired)
+      return
+    }
     setSaving(true)
     try {
       await fetch(`/api/profiles/${profile.id}`, {
@@ -36,6 +51,8 @@ export default function SettingsPage() {
           budget_cycle_day: budgetDay,
           notify_daily: notifyEnabled,
           notify_time: notifyTime,
+          monthly_summary_email_enabled: monthlySummaryEnabled,
+          email: email.trim() || null,
         }),
       })
       await refetch()
@@ -156,6 +173,46 @@ export default function SettingsPage() {
                 onChange={e => setNotifyTime(e.target.value)}
                 className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
               />
+            </div>
+          )}
+        </Card>
+
+        {/* Monthly Summary Email */}
+        <Card padding="md">
+          <div className="flex items-center gap-2 mb-3">
+            <Mail size={16} className="text-brand-600" />
+            <h3 className="text-sm font-semibold text-gray-800">{t.settings.monthlySummary}</h3>
+          </div>
+
+          <div className="flex items-center justify-between mb-3 gap-3">
+            <div>
+              <p className="text-sm text-gray-700">{t.settings.monthlySummaryToggle}</p>
+              <p className="text-xs text-gray-400">{t.settings.monthlySummaryDesc}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMonthlySummaryEnabled(!monthlySummaryEnabled)}
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                monthlySummaryEnabled ? 'bg-brand-500' : 'bg-gray-300'
+              }`}
+            >
+              <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md ring-0 transition-transform duration-200 ease-in-out ${
+                monthlySummaryEnabled ? 'translate-x-5' : 'translate-x-0'
+              }`} />
+            </button>
+          </div>
+
+          {monthlySummaryEnabled && (
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">{t.settings.email}</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+              />
+              <p className="text-xs text-gray-400 mt-1">{t.settings.monthlySummaryHint}</p>
             </div>
           )}
         </Card>

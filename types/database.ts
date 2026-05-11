@@ -20,6 +20,7 @@ export interface Database {
           timezone: string
           notify_daily: boolean
           notify_time: string
+          monthly_summary_email_enabled: boolean
           created_at: string
           updated_at: string
         }
@@ -33,6 +34,7 @@ export interface Database {
           timezone?: string
           notify_daily?: boolean
           notify_time?: string
+          monthly_summary_email_enabled?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -46,6 +48,7 @@ export interface Database {
           timezone?: string
           notify_daily?: boolean
           notify_time?: string
+          monthly_summary_email_enabled?: boolean
           updated_at?: string
         }
       }

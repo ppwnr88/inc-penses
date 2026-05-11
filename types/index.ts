@@ -13,6 +13,7 @@ export interface Profile {
   timezone: string
   notify_daily: boolean
   notify_time: string
+  monthly_summary_email_enabled: boolean
   lang?: string
   created_at: string
   updated_at: string

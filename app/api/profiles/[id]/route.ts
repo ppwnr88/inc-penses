@@ -5,8 +5,10 @@ import { createServerClient } from '@/lib/supabase/server'
 const updateSchema = z.object({
   display_name: z.string().min(1).optional(),
   budget_cycle_day: z.number().int().min(1).max(28).optional(),
+  email: z.string().email().nullable().optional(),
   notify_daily: z.boolean().optional(),
   notify_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).optional(),
+  monthly_summary_email_enabled: z.boolean().optional(),
   timezone: z.string().optional(),
   lang: z.string().max(5).optional(),
 })

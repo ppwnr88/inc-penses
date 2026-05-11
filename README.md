@@ -55,8 +55,12 @@ app/
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Yes |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/publishable key | Yes |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key for server-side jobs/webhooks | Yes |
 | `NEXT_PUBLIC_LIFF_ID` | LINE LIFF ID from LINE Developers | Yes (for production) |
 | `NEXT_PUBLIC_APP_URL` | App base URL | Yes |
+| `RESEND_API_KEY` | Resend API key for monthly summary emails | Yes (for email summaries) |
+| `EMAIL_FROM` | Verified sender email, e.g. `noreply@wannarat.cc` | Yes (for email summaries) |
+| `CRON_SECRET` | Secret used to protect scheduled cron endpoints | Yes (for scheduled jobs) |
 
 ## Setup
 
@@ -81,6 +85,12 @@ Run the migration in your Supabase dashboard (SQL Editor):
 ```bash
 # Copy and run in Supabase SQL Editor:
 supabase/migrations/001_initial_schema.sql
+```
+
+Run additional migrations in order when present:
+
+```bash
+supabase/migrations/002_monthly_summary_email.sql
 ```
 
 Optionally run seed data for development:
