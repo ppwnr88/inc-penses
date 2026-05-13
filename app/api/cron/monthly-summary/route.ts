@@ -58,6 +58,19 @@ async function logMonthlySummarySent(
   if (error) throw new Error(error.message)
 }
 
+async function logMonthlySummaryStatus(
+  supabase: ReturnType<typeof createAdminClient>,
+  profileId: string,
+  action: 'monthly_summary_email_skipped' | 'monthly_summary_email_failed',
+  metadata: Record<string, unknown>
+): Promise<void> {
+  await supabase.from('usage_logs').insert({
+    profile_id: profileId,
+    action,
+    metadata,
+  })
+}
+
 export async function GET(req: NextRequest) {
   if (!isAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -93,6 +106,11 @@ export async function GET(req: NextRequest) {
     try {
       const sent = await hasSentMonthlySummary(supabase, profile.id, period.period)
       if (sent) {
+        await logMonthlySummaryStatus(supabase, profile.id, 'monthly_summary_email_skipped', {
+          period: period.period,
+          email: profile.email,
+          reason: 'already_sent',
+        })
         results.skipped += 1
         continue
       }
@@ -107,6 +125,11 @@ export async function GET(req: NextRequest) {
       await logMonthlySummarySent(supabase, profile.id, period.period, profile.email, summary.transactionCount)
       results.sent += 1
     } catch (err) {
+      await logMonthlySummaryStatus(supabase, profile.id, 'monthly_summary_email_failed', {
+        period: period.period,
+        email: profile.email,
+        message: err instanceof Error ? err.message : 'Unknown error',
+      })
       results.failed += 1
       results.errors.push({
         profile_id: profile.id,

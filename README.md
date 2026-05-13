@@ -45,6 +45,7 @@
 | CSV export | Done |
 | Excel export | Done |
 | Automatic previous-month email summary with Excel attachment | Done |
+| Read-only Backoffice dashboard | Done |
 | Daily LINE reminders | Scaffold / not wired |
 | Voice input | Scaffold / not wired |
 
@@ -62,10 +63,12 @@ app/
 │   ├── reports/             # Monthly reports and exports
 │   ├── recurring/           # Recurring transactions
 │   └── settings/            # Settings, export, email summary opt-in
+├── backoffice/              # Read-only admin dashboard
 └── api/
     ├── auth/line/           # LINE profile upsert
     ├── webhook/             # LINE Messaging webhook
     ├── cron/monthly-summary # Vercel Cron email job
+    ├── backoffice/          # Backoffice auth/session/summary APIs
     ├── export/              # CSV/Excel download
     ├── reports/             # Monthly aggregation
     ├── transactions/        # Transaction CRUD
@@ -98,6 +101,8 @@ lib/
 | `RESEND_API_KEY` | Resend API key for monthly summary emails | Yes for email summary |
 | `EMAIL_FROM` | Verified sender email, e.g. `noreply@wannarat.cc` | Yes for email summary |
 | `CRON_SECRET` | Secret used by Vercel Cron Authorization header | Yes for scheduled jobs |
+| `BACKOFFICE_PASSWORD` | Password for `/backoffice` login | Yes for Backoffice |
+| `BACKOFFICE_SESSION_SECRET` | Random secret used to sign Backoffice session cookies | Yes for Backoffice |
 
 Do not commit real secrets. Put them in `.env.local` for local development and Vercel Environment Variables for production.
 
@@ -194,6 +199,31 @@ Operational checklist:
 
 `CRON_SECRET` is compared against the `Authorization: Bearer <CRON_SECRET>` header. Vercel sends this automatically when the environment variable exists.
 
+## Backoffice
+
+Backoffice is available at:
+
+```text
+https://your-domain.com/backoffice
+```
+
+It is a read-only dashboard for operational visibility. It shows system KPIs, monthly income/expense totals, monthly email summary status, and user-level summary rows. Admins can switch between the latest 6 months and click a user to view read-only transactions for the selected month. It does not expose receipt files or raw attachments and does not allow editing or deleting user data in v1.
+
+Required environment variables:
+
+```text
+BACKOFFICE_PASSWORD=your-backoffice-password
+BACKOFFICE_SESSION_SECRET=your-random-backoffice-session-secret
+```
+
+Generate a strong session secret with:
+
+```bash
+openssl rand -base64 32
+```
+
+Backoffice uses a signed `httpOnly` cookie named `backoffice_session` with a 24-hour lifetime.
+
 ## Common Commands
 
 ```bash
@@ -209,6 +239,7 @@ Note: `npm run lint` currently uses `next lint`, which is no longer valid for th
 ```text
 Landing page: http://localhost:3000
 LIFF app:     http://localhost:3000/liff
+Backoffice:   http://localhost:3000/backoffice
 ```
 
 ## Database Schema
@@ -236,6 +267,7 @@ See:
 - `RESEND_API_KEY`, `LINE_CHANNEL_ACCESS_TOKEN`, `LINE_CHANNEL_SECRET`, `GEMINI_API_KEY`, and `CRON_SECRET` must never be committed.
 - Current Supabase RLS policies in the initial migration are permissive for app-level auth. Tighten these before handling sensitive multi-user production data outside trusted server routes.
 - Vercel Cron endpoint is protected by `CRON_SECRET`.
+- Backoffice is protected by `BACKOFFICE_PASSWORD` and a signed httpOnly session cookie.
 
 ## TODO
 
