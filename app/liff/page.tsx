@@ -12,6 +12,7 @@ import { Card } from '@/components/ui/Card'
 import { useTransactions } from '@/features/transactions/useTransactions'
 import { useCategories } from '@/features/categories/useCategories'
 import { useBudgets } from '@/features/budgets/useBudgets'
+import { useReports } from '@/features/reports/useReports'
 import { getThaiMonthName, getCurrentMonthYear } from '@/lib/utils/date'
 import type { Transaction } from '@/types'
 import Link from 'next/link'
@@ -28,12 +29,13 @@ export default function DashboardPage() {
     year,
     limit: 20,
   })
+  const { report, loading: reportLoading, refetch: refetchReport } = useReports()
   const { categories } = useCategories()
   const { budgets, loading: budgetLoading } = useBudgets()
 
-  const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
-  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
-  const balance = totalIncome - totalExpense
+  const totalIncome = report?.totalIncome ?? 0
+  const totalExpense = report?.totalExpense ?? 0
+  const balance = report?.net ?? 0
 
   const totalBudget = budgets.reduce((s, b) => s + b.amount, 0)
   const totalSpent = budgets.reduce((s, b) => s + (b.spent ?? 0), 0)
@@ -45,6 +47,7 @@ export default function DashboardPage() {
     await createTransaction(data)
     setShowForm(false)
     refetch()
+    refetchReport()
   }
 
   const greeting = (() => {
@@ -95,7 +98,7 @@ export default function DashboardPage() {
         totalIncome={totalIncome}
         totalExpense={totalExpense}
         balance={balance}
-        loading={txLoading}
+        loading={reportLoading}
       />
 
       {/* Budget Overview */}
