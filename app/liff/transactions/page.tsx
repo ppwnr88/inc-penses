@@ -13,9 +13,11 @@ import { useCategories } from '@/features/categories/useCategories'
 import { getCurrentMonthYear } from '@/lib/utils/date'
 import type { Transaction } from '@/types'
 import { usePreferences } from '@/lib/i18n/PreferencesContext'
+import { useAuth } from '@/features/auth/useAuth'
 
 export default function TransactionsPage() {
   const { t } = usePreferences()
+  const { profile } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const { month, year } = getCurrentMonthYear()
@@ -77,6 +79,24 @@ export default function TransactionsPage() {
     router.replace('/liff/transactions')
   }
 
+  async function notifyTransactionUpdated(transactionId: string) {
+    if (!profile || !shouldReturnToChat) return
+
+    const res = await fetch('/api/line/transaction-updated', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        profile_id: profile.id,
+        transaction_id: transactionId,
+      }),
+    })
+
+    if (!res.ok) {
+      const body = (await res.json().catch(() => ({}))) as { error?: string }
+      throw new Error(body.error ?? 'Failed to send update confirmation')
+    }
+  }
+
   async function handleCreate(
     data: Omit<Transaction, 'id' | 'profile_id' | 'created_at' | 'updated_at' | 'category'>
   ) {
@@ -90,6 +110,9 @@ export default function TransactionsPage() {
   ) {
     if (!editingTransaction) return
     await updateTransaction(editingTransaction.id, data)
+    await notifyTransactionUpdated(editingTransaction.id).catch(err => {
+      console.warn('[transactions] update confirmation failed', err)
+    })
     setEditingTransaction(null)
     await closeToChatOrList()
   }

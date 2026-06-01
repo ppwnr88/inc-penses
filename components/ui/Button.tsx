@@ -48,7 +48,7 @@ export function Button({
       disabled={disabled || loading}
       className={twMerge(
         clsx(
-          'inline-flex items-center justify-center font-medium transition-all duration-150',
+          'relative inline-flex items-center justify-center overflow-hidden font-medium transition-all duration-150',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           variantStyles[variant],
@@ -59,11 +59,16 @@ export function Button({
       )}
       {...props}
     >
-      {loading ? (
-        <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-      ) : leftIcon}
-      {children}
-      {!loading && rightIcon}
+      {loading && (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+        </span>
+      )}
+      <span className={clsx('inline-flex min-w-0 items-center justify-center gap-2', loading && 'invisible')}>
+        {leftIcon}
+        <span className="min-w-0 truncate">{children}</span>
+        {rightIcon}
+      </span>
     </button>
   )
 }

@@ -24,11 +24,17 @@ export async function replyMessage(replyToken: string, messages: object[]) {
 }
 
 export async function pushMessage(userId: string, messages: object[]) {
-  await fetch(`${LINE_API}/message/push`, {
+  const res = await fetch(`${LINE_API}/message/push`, {
     method: 'POST',
     headers: authHeader(),
     body: JSON.stringify({ to: userId, messages }),
   })
+
+  if (!res.ok) {
+    const body = await res.text()
+    console.log('[push] LINE error', res.status, body)
+    throw new Error(`LINE push failed: ${res.status}`)
+  }
 }
 
 // ── Flex: Transaction confirmed ───────────────────────────────────────────────
