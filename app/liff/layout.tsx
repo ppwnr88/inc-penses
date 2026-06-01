@@ -23,9 +23,12 @@ function PageRouter({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (page && PAGE_MAP[page]) {
-      routerNav.replace(PAGE_MAP[page])
+      const params = new URLSearchParams(router?.toString())
+      params.delete('page')
+      const query = params.toString()
+      routerNav.replace(`${PAGE_MAP[page]}${query ? `?${query}` : ''}`)
     }
-  }, [page, routerNav])
+  }, [page, router, routerNav])
 
   return <>{children}</>
 }

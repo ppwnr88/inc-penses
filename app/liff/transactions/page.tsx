@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Header } from '@/components/layout/Header'
 import { TransactionList } from '@/features/transactions/TransactionList'
 import { TransactionFilters } from '@/features/transactions/TransactionFilters'
@@ -15,9 +16,13 @@ import { usePreferences } from '@/lib/i18n/PreferencesContext'
 
 export default function TransactionsPage() {
   const { t } = usePreferences()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const { month, year } = getCurrentMonthYear()
   const [showForm, setShowForm] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+  const editTransactionId = searchParams.get('edit_tx')
+  const shouldReturnToChat = searchParams.get('return') === 'chat'
 
   const {
     transactions,
@@ -33,6 +38,45 @@ export default function TransactionsPage() {
 
   const { categories } = useCategories()
 
+  useEffect(() => {
+    if (!editTransactionId) return
+
+    let cancelled = false
+
+    async function openTransactionEditor() {
+      const res = await fetch(`/api/transactions/${editTransactionId}`)
+      if (!res.ok) return
+      const body = (await res.json()) as { data: Transaction }
+      if (!cancelled) setEditingTransaction(body.data)
+    }
+
+    openTransactionEditor()
+
+    return () => {
+      cancelled = true
+    }
+  }, [editTransactionId])
+
+  async function closeToChatOrList() {
+    if (!shouldReturnToChat) {
+      router.replace('/liff/transactions')
+      return
+    }
+
+    try {
+      const { getLiffModule } = await import('@/lib/liff/init')
+      const liff = await getLiffModule()
+      if (liff?.isInClient()) {
+        liff.closeWindow()
+        return
+      }
+    } catch {
+      // Fall through to the in-app list when LIFF is unavailable locally.
+    }
+
+    router.replace('/liff/transactions')
+  }
+
   async function handleCreate(
     data: Omit<Transaction, 'id' | 'profile_id' | 'created_at' | 'updated_at' | 'category'>
   ) {
@@ -47,6 +91,7 @@ export default function TransactionsPage() {
     if (!editingTransaction) return
     await updateTransaction(editingTransaction.id, data)
     setEditingTransaction(null)
+    await closeToChatOrList()
   }
 
   async function handleDelete(id: string) {

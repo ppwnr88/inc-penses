@@ -69,7 +69,7 @@ export function transactionConfirmedFlex(opts: {
   const labelDate = isEn ? 'Date' : 'วันที่'
 
   const cancelLabel = isEn ? 'Cancel' : 'ยกเลิก'
-  const summaryLabel = isEn ? 'Summary' : 'ดูสรุป'
+  const editLabel = isEn ? 'Edit' : 'แก้ไข'
   const cancelDisplayText = isEn ? 'Cancel last item' : 'ยกเลิกรายการล่าสุด'
   const incomeTotalLabel = isEn ? 'Income' : 'รวมรับ'
   const expenseTotalLabel = isEn ? 'Expense' : 'รวมจ่าย'
@@ -221,10 +221,10 @@ export function transactionConfirmedFlex(opts: {
             layout: 'horizontal' as const,
             spacing: 'md' as const,
             contents: [
-              actionBox(fa('circle-check', 'ffffff'), summaryLabel, '#6b8f5e', {
+              actionBox(fa('pen-to-square', 'ffffff'), editLabel, '#6b8f5e', {
                 type: 'uri',
-                label: summaryLabel,
-                uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}`,
+                label: editLabel,
+                uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}?page=transactions&edit_tx=${opts.transactionId}&return=chat`,
               }, 1),
               actionBox(fa('trash-can', 'ffffff'), cancelLabel, '#e8837a', {
                 type: 'postback',
