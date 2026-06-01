@@ -221,7 +221,7 @@ export function transactionConfirmedFlex(opts: {
             layout: 'horizontal' as const,
             spacing: 'md' as const,
             contents: [
-              actionBox(fa('pen-to-square', 'ffffff'), editLabel, '#6b8f5e', {
+              actionBox(fa('pen-to-square', 'ffffff'), editLabel, '#d99a2b', {
                 type: 'uri',
                 label: editLabel,
                 uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}?page=transactions&edit_tx=${opts.transactionId}&return=chat`,
