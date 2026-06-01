@@ -15,6 +15,7 @@ type MonthlyEmailProfile = {
   id: string
   display_name: string
   email: string | null
+  monthly_summary_email_cc: string | null
 }
 
 function isAuthorized(req: NextRequest): boolean {
@@ -47,12 +48,13 @@ async function logMonthlySummarySent(
   profileId: string,
   period: string,
   email: string,
+  cc: string | null,
   transactionCount: number
 ): Promise<void> {
   const { error } = await supabase.from('usage_logs').insert({
     profile_id: profileId,
     action: 'monthly_summary_email_sent',
-    metadata: { period, email, transaction_count: transactionCount },
+    metadata: { period, email, cc, transaction_count: transactionCount },
   })
 
   if (error) throw new Error(error.message)
@@ -81,7 +83,7 @@ export async function GET(req: NextRequest) {
 
   const { data: profiles, error } = await supabase
     .from('profiles')
-    .select('id, display_name, email')
+    .select('id, display_name, email, monthly_summary_email_cc')
     .eq('monthly_summary_email_enabled', true)
     .not('email', 'is', null)
 
@@ -109,6 +111,7 @@ export async function GET(req: NextRequest) {
         await logMonthlySummaryStatus(supabase, profile.id, 'monthly_summary_email_skipped', {
           period: period.period,
           email: profile.email,
+          cc: profile.monthly_summary_email_cc,
           reason: 'already_sent',
         })
         results.skipped += 1
@@ -117,17 +120,30 @@ export async function GET(req: NextRequest) {
 
       const summary = await buildMonthlyEmailSummary(
         supabase,
-        { id: profile.id, display_name: profile.display_name, email: profile.email },
+        {
+          id: profile.id,
+          display_name: profile.display_name,
+          email: profile.email,
+          monthly_summary_email_cc: profile.monthly_summary_email_cc,
+        },
         period
       )
       const buffer = await createMonthlySummaryExcel(summary)
       await sendMonthlySummaryEmail(summary, createMonthlySummaryAttachment(summary, buffer))
-      await logMonthlySummarySent(supabase, profile.id, period.period, profile.email, summary.transactionCount)
+      await logMonthlySummarySent(
+        supabase,
+        profile.id,
+        period.period,
+        profile.email,
+        profile.monthly_summary_email_cc,
+        summary.transactionCount
+      )
       results.sent += 1
     } catch (err) {
       await logMonthlySummaryStatus(supabase, profile.id, 'monthly_summary_email_failed', {
         period: period.period,
         email: profile.email,
+        cc: profile.monthly_summary_email_cc,
         message: err instanceof Error ? err.message : 'Unknown error',
       })
       results.failed += 1

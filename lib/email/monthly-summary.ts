@@ -1,11 +1,13 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { CategorySummary, Transaction } from '@/types'
+import { parseEmailList } from '@/lib/email/recipients'
 import { getThaiMonthName } from '@/lib/utils/date'
 
 type ProfileForEmail = {
   id: string
   display_name: string
   email: string
+  monthly_summary_email_cc?: string | null
 }
 
 export type MonthlyEmailSummary = {
@@ -218,6 +220,11 @@ export async function sendMonthlySummaryEmail(summary: MonthlyEmailSummary, atta
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) throw new Error('RESEND_API_KEY is not configured')
 
+  const to = parseEmailList(summary.profile.email)
+  const toSet = new Set(to.map(email => email.toLowerCase()))
+  const cc = parseEmailList(summary.profile.monthly_summary_email_cc).filter(email => !toSet.has(email.toLowerCase()))
+  if (to.length === 0) throw new Error('No monthly summary recipients')
+
   const from = process.env.EMAIL_FROM ?? 'noreply@wannarat.cc'
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -227,7 +234,8 @@ export async function sendMonthlySummaryEmail(summary: MonthlyEmailSummary, atta
     },
     body: JSON.stringify({
       from: `จด <${from}>`,
-      to: [summary.profile.email],
+      to,
+      ...(cc.length > 0 ? { cc } : {}),
       subject: `สรุปรายรับรายจ่าย ${summary.periodLabel}`,
       html: buildMonthlySummaryEmailHtml(summary),
       attachments: [attachment],

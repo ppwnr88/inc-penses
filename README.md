@@ -134,6 +134,10 @@ Run migrations in Supabase SQL Editor in order:
 -- 2. Monthly email summary settings
 -- Copy and run:
 -- supabase/migrations/002_monthly_summary_email.sql
+
+-- 3. Monthly email summary CC field
+-- Copy and run:
+-- supabase/migrations/003_monthly_summary_email_cc.sql
 ```
 
 Optional seed data for local/dev:
@@ -167,7 +171,7 @@ https://your-domain.com/api/webhook
 
 ## Monthly Email Summary
 
-Users can enable automatic previous-month summaries in `Settings`. When enabled, the profile must have an email address.
+Users can enable automatic previous-month summaries in `Settings`. When enabled, the profile must have an email address. The main email and optional CC field both support multiple addresses separated by `;` or `,`.
 
 The system sends every 1st day of the month at 08:00 Asia/Bangkok. Vercel Cron uses UTC, so the production schedule is:
 
@@ -260,6 +264,7 @@ See:
 
 - `supabase/migrations/001_initial_schema.sql`
 - `supabase/migrations/002_monthly_summary_email.sql`
+- `supabase/migrations/003_monthly_summary_email_cc.sql`
 
 ## Security Notes
 

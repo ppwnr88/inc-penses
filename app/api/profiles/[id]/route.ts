@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServerClient } from '@/lib/supabase/server'
+import { hasInvalidEmails } from '@/lib/email/recipients'
 
 const updateSchema = z.object({
   display_name: z.string().min(1).optional(),
   budget_cycle_day: z.number().int().min(1).max(28).optional(),
-  email: z.string().email().nullable().optional(),
+  email: z.string().nullable().optional(),
+  monthly_summary_email_cc: z.string().nullable().optional(),
   notify_daily: z.boolean().optional(),
   notify_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).optional(),
   monthly_summary_email_enabled: z.boolean().optional(),
@@ -22,6 +24,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    }
+
+    if (hasInvalidEmails(parsed.data.email) || hasInvalidEmails(parsed.data.monthly_summary_email_cc)) {
+      return NextResponse.json({ error: 'Invalid email list' }, { status: 400 })
     }
 
     const supabase = createServerClient()

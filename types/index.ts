@@ -9,6 +9,7 @@ export interface Profile {
   display_name: string
   picture_url: string | null
   email: string | null
+  monthly_summary_email_cc: string | null
   budget_cycle_day: number
   timezone: string
   notify_daily: boolean

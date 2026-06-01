@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/features/auth/useAuth'
 import { usePreferences, CURRENCIES } from '@/lib/i18n/PreferencesContext'
+import { hasInvalidEmails } from '@/lib/email/recipients'
 import type { Lang } from '@/lib/i18n/translations'
 
 const APP_VERSION = '0.1.0'
@@ -19,6 +20,7 @@ export default function SettingsPage() {
   const [notifyTime, setNotifyTime] = useState(profile?.notify_time ?? '20:00')
   const [monthlySummaryEnabled, setMonthlySummaryEnabled] = useState(profile?.monthly_summary_email_enabled ?? false)
   const [email, setEmail] = useState(profile?.email ?? '')
+  const [emailCc, setEmailCc] = useState(profile?.monthly_summary_email_cc ?? '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [deleteFrom, setDeleteFrom] = useState('')
@@ -34,12 +36,17 @@ export default function SettingsPage() {
     setNotifyTime(profile.notify_time ?? '20:00')
     setMonthlySummaryEnabled(profile.monthly_summary_email_enabled ?? false)
     setEmail(profile.email ?? '')
+    setEmailCc(profile.monthly_summary_email_cc ?? '')
   }, [profile])
 
   async function handleSave() {
     if (!profile) return
     if (monthlySummaryEnabled && !email.trim()) {
       alert(t.settings.monthlySummaryEmailRequired)
+      return
+    }
+    if (monthlySummaryEnabled && (hasInvalidEmails(email) || hasInvalidEmails(emailCc))) {
+      alert(t.settings.monthlySummaryEmailInvalid)
       return
     }
     setSaving(true)
@@ -53,6 +60,7 @@ export default function SettingsPage() {
           notify_time: notifyTime,
           monthly_summary_email_enabled: monthlySummaryEnabled,
           email: email.trim() || null,
+          monthly_summary_email_cc: emailCc.trim() || null,
         }),
       })
       await refetch()
@@ -206,10 +214,18 @@ export default function SettingsPage() {
             <div>
               <label className="block text-xs text-gray-500 mb-1">{t.settings.email}</label>
               <input
-                type="email"
+                type="text"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="name@example.com"
+                placeholder="aa@gmail.com; bb@gmail.com"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+              />
+              <label className="block text-xs text-gray-500 mt-3 mb-1">{t.settings.emailCc}</label>
+              <input
+                type="text"
+                value={emailCc}
+                onChange={e => setEmailCc(e.target.value)}
+                placeholder="cc@example.com"
                 className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
               />
               <p className="text-xs text-gray-400 mt-1">{t.settings.monthlySummaryHint}</p>
