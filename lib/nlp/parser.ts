@@ -39,23 +39,60 @@ const SUMMARY_CMDS = ['สรุป','ดูสรุป','สรุปเดื
 const DELETE_CMDS  = ['ลบ','ลบรายการล่าสุด','undo','ยกเลิก','cancel']
 const HELP_CMDS    = ['help','ช่วยเหลือ','จด ช่วยเหลือ','วิธีใช้','?']
 
-// Parse "วันที่ N" or "วันที่ NN" from text, returns { day, cleaned }
-function extractDateTag(text: string): { day: number | null; cleaned: string } {
-  const match = text.match(/วันที่\s*([๐-๙\d]{1,2})/)
-  if (!match) return { day: null, cleaned: text }
-  const day = parseInt(thaiToArabic(match[1]))
-  const cleaned = text.replace(match[0], '').replace(/\s+/g, ' ').trim()
-  return { day: isNaN(day) || day < 1 || day > 31 ? null : day, cleaned }
+function getBangkokDateParts(reference: Date): { year: number; month: number; day: number } {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(reference)
+
+  return {
+    year: Number(parts.find(part => part.type === 'year')?.value),
+    month: Number(parts.find(part => part.type === 'month')?.value),
+    day: Number(parts.find(part => part.type === 'day')?.value),
+  }
 }
 
-function buildDateString(day: number): string {
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = now.getMonth() + 1
+function formatDateParts(year: number, month: number, day: number): string {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
-export function parseMessage(text: string): ParseResult {
+function buildDateString(day: number, reference: Date): string {
+  const bangkok = getBangkokDateParts(reference)
+  return formatDateParts(bangkok.year, bangkok.month, day)
+}
+
+function buildRelativeDateString(daysAgo: number, reference: Date): string {
+  const bangkok = getBangkokDateParts(reference)
+  const date = new Date(Date.UTC(bangkok.year, bangkok.month - 1, bangkok.day - daysAgo))
+  return formatDateParts(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate())
+}
+
+function extractDateTag(text: string, reference: Date): { date?: string; cleaned: string } {
+  const explicitMatch = text.match(/วันที่\s*([๐-๙\d]{1,2})/)
+  const relativeMatch = text.match(/เมื่อวานซืน|เมื่อวาน/)
+  let date: string | undefined
+
+  if (explicitMatch) {
+    const day = parseInt(thaiToArabic(explicitMatch[1]))
+    if (!isNaN(day) && day >= 1 && day <= 31) {
+      date = buildDateString(day, reference)
+    }
+  } else if (relativeMatch) {
+    date = buildRelativeDateString(relativeMatch[0] === 'เมื่อวานซืน' ? 2 : 1, reference)
+  }
+
+  const cleaned = text
+    .replace(explicitMatch?.[0] ?? '', '')
+    .replace(/เมื่อวานซืน|เมื่อวาน/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  return { date, cleaned }
+}
+
+export function parseMessage(text: string, reference = new Date()): ParseResult {
   const t = text.trim()
   const lower = t.toLowerCase()
 
@@ -66,9 +103,8 @@ export function parseMessage(text: string): ParseResult {
   if (HELP_CMDS.some(c => lower === c || lower.startsWith(c)))
     return { isCommand: true, command: 'help' }
 
-  // Extract "วันที่ N" before parsing amount
-  const { day, cleaned } = extractDateTag(t)
-  const date = day != null ? buildDateString(day) : undefined
+  // Extract explicit or relative date before parsing amount.
+  const { date, cleaned } = extractDateTag(t, reference)
 
   // Extract amount — match number (with optional .,) anywhere in text
   const normalised = thaiToArabic(cleaned)
