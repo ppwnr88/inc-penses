@@ -14,7 +14,7 @@ export async function readSlipWithOpenThai(image: Buffer, mimeType: string): Pro
   const response = await fetch('https://api.iapp.co.th/v3/llm/openthai2p0/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', apikey: key },
-    signal: AbortSignal.timeout(45000),
+    signal: AbortSignal.timeout(15000),
     body: JSON.stringify({
       model: 'openthai2.0', temperature: 0, chat_template_kwargs: { enable_thinking: false },
       messages: [{ role: 'user', content: [

@@ -99,7 +99,7 @@ lib/
 | `LINE_CHANNEL_SECRET` | LINE Messaging API channel secret for webhook signature verification | Yes for LINE bot |
 | `TYPESAFE_API_KEY` | TypeSafe Jev API key for LINE transaction categorization; falls back to keyword rules when unavailable | Optional |
 | `IAPP_API_KEY` | iApp API key for OpenThai 2.0 payment slip OCR | Yes for OpenThai OCR |
-| `GEMINI_API_KEY` | Existing fallback used when IAPP_API_KEY is not configured | Optional |
+| `GEMINI_API_KEY` | Gemini 3.8 Flash, then 3.5 Flash-Lite if unavailable, when OpenThai fails or is not configured | Optional |
 | `RESEND_API_KEY` | Resend API key for monthly summary emails | Yes for email summary |
 | `EMAIL_FROM` | Verified sender email, e.g. `noreply@wannarat.cc` | Yes for email summary |
 | `CRON_SECRET` | Secret used by Vercel Cron Authorization header | Yes for scheduled jobs |

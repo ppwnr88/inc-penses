@@ -1,4 +1,8 @@
-const GEMINI_API = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent'
+import { z } from 'zod'
+
+const GEMINI_API = 'https://generativelanguage.googleapis.com/v1beta/models'
+const responseSchema = z.object({ candidates: z.array(z.object({ content: z.object({ parts: z.array(z.object({ text: z.string().optional(), thought: z.boolean().optional() })) }) })).min(1) })
+const slipSchema = z.object({ amount: z.union([z.number(), z.string()]), note: z.string().nullish(), date: z.string().nullish(), error: z.string().optional() })
 
 export interface SlipResult {
   amount: number
@@ -33,59 +37,46 @@ If not a payment slip, reply: {"error": "not_a_slip"}`
         { inline_data: { mime_type: mimeType, data: base64 } },
       ],
     }],
-    generationConfig: { temperature: 0, maxOutputTokens: 1024 },
+    generationConfig: { maxOutputTokens: 4096, responseMimeType: 'application/json', thinkingConfig: { thinkingLevel: 'low' } },
   }
 
-  let res: Response | null = null
-  for (let attempt = 1; attempt <= 3; attempt++) {
+  let parsed: z.infer<typeof slipSchema> | undefined
+  for (const [model, timeout] of [['gemini-3.8-flash', 10000], ['gemini-3.5-flash-lite', 20000]] as const) {
     try {
-      res = await fetch(`${GEMINI_API}?key=${apiKey}`, {
+      const res = await fetch(`${GEMINI_API}/${model}:generateContent`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify(body),
+        signal: AbortSignal.timeout(timeout),
       })
-    } catch (err) {
-      if (attempt === 3) throw new Error(`GEMINI_FETCH: ${err}`)
-      await new Promise(r => setTimeout(r, attempt * 1500))
-      continue
+      if (!res.ok) throw new Error(`GEMINI_${res.status}`)
+      const data = responseSchema.parse(await res.json())
+      const text = data.candidates[0].content.parts.filter(part => !part.thought).map(part => part.text ?? '').join('')
+      const candidate = slipSchema.parse(JSON.parse(text))
+      const candidateAmount = Number(String(candidate.amount).replace(/,/g, ''))
+      if (candidate.error || !Number.isFinite(candidateAmount) || candidateAmount <= 0) throw new Error('GEMINI_BAD_RESULT')
+      parsed = candidate
+      break
+    } catch {
+      console.warn(`[gemini] ${model} unavailable or returned invalid data`)
     }
-    if (res.status === 503 || res.status === 429) {
-      if (attempt === 3) throw new Error(`GEMINI_${res.status}: overloaded`)
-      await new Promise(r => setTimeout(r, attempt * 2000))
-      continue
-    }
-    break
   }
-
-  if (!res || !res.ok) {
-    const errBody = res ? await res.text() : 'no response'
-    throw new Error(`GEMINI_${res?.status ?? 0}: ${errBody.slice(0, 200)}`)
-  }
-
-  const data = await res.json() as { candidates?: { content: { parts: { text: string }[] } }[] }
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
-
-  const jsonMatch = text.match(/\{[\s\S]*?\}/)
-  if (!jsonMatch) throw new Error(`GEMINI_NO_JSON: ${text.slice(0, 100)}`)
-
-  const parsed = JSON.parse(jsonMatch[0]) as { error?: string; amount?: number | string; note?: string; date?: string }
-  if (parsed.error) throw new Error(`GEMINI_NOT_SLIP: ${parsed.error}`)
-  if (parsed.amount === undefined || parsed.amount === null) throw new Error('GEMINI_NO_AMOUNT')
-
+  if (!parsed) throw new Error('GEMINI_UNAVAILABLE')
   const amount = Number(String(parsed.amount).replace(/,/g, ''))
-  if (!amount || amount <= 0) throw new Error(`GEMINI_BAD_AMOUNT: ${parsed.amount}`)
 
-  // Validate date — reject if year is unreasonably old (Gemini sometimes miscalculates BE→CE)
   let date: string | undefined
-  if (parsed.date && parsed.date !== 'null') {
-    const year = parseInt(parsed.date.slice(0, 4))
-    const currentYear = new Date().getFullYear()
-    date = (year >= currentYear - 1 && year <= currentYear + 1) ? parsed.date : undefined
+  const match = parsed.date?.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (match) {
+    const year = Number(match[1]) >= 2400 ? Number(match[1]) - 543 : Number(match[1])
+    const candidate = `${year}-${match[2]}-${match[3]}`
+    const check = new Date(`${candidate}T00:00:00Z`)
+    const currentYear = new Date().getUTCFullYear()
+    if (year >= currentYear - 1 && year <= currentYear + 1 && !Number.isNaN(check.valueOf()) && check.toISOString().slice(0, 10) === candidate) date = candidate
   }
 
   return {
     amount,
-    note: (parsed.note ?? 'slip โอนเงิน').slice(0, 60),
+    note: parsed.note?.trim().slice(0, 60) || 'slip โอนเงิน',
     date,
     type: 'expense',
   }

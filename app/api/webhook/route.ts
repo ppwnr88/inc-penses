@@ -11,8 +11,8 @@ import {
 } from '@/lib/line/reply'
 import { createAdminClient } from '@/lib/supabase/server'
 import { DEFAULT_CATEGORIES } from '@/lib/utils/categories'
-import { downloadLineImage, readSlipWithGemini } from '@/lib/ai/gemini'
-import { readSlipWithOpenThai } from '@/lib/ai/openthai'
+import { downloadLineImage } from '@/lib/ai/gemini'
+import { readSlip } from '@/lib/ai/slip'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -231,9 +231,7 @@ async function handleImageMessage(event: LineImageEvent) {
 
   try {
     const { buffer: imageBuffer, mimeType } = await downloadLineImage(message.id)
-    const slip = process.env.IAPP_API_KEY
-      ? await readSlipWithOpenThai(imageBuffer, mimeType)
-      : await readSlipWithGemini(imageBuffer, mimeType)
+    const slip = await readSlip(imageBuffer, mimeType)
 
     if (!slip) {
       await replyMessage(replyToken, [{
