@@ -52,8 +52,7 @@ export function transactionConfirmedFlex(opts: {
   const isIncome  = opts.type === 'income'
   const isEn      = opts.lang === 'en'
   const accentClr = isIncome ? '#356c39' : '#a84034'
-  const headerBg  = isIncome ? '#e5efc9' : '#ffe2cf'
-  const iconBg    = isIncome ? '#c5db9e' : '#ffbfa7'
+  const headerBg  = isIncome ? '#d5eca9' : '#ffc0a9'
   const label     = isIncome
     ? (isEn ? 'Income' : 'รายรับ')
     : (isEn ? 'Expense' : 'รายจ่าย')
@@ -105,42 +104,45 @@ export function transactionConfirmedFlex(opts: {
     }],
   })
 
-  // Row: icon circle | label | value
   const row = (iconUrl: string, iconBg: string, labelText: string, value: string) => ({
     type: 'box' as const,
     layout: 'horizontal' as const,
-    paddingTop: '5px',
-    paddingBottom: '5px',
+    paddingTop: '3px',
+    paddingBottom: '3px',
     alignItems: 'center' as const,
     contents: [
-      iconCircle(iconUrl, iconBg, '30px', '15px'),
-      { type: 'text' as const, text: labelText, size: 'xs' as const, color: '#75664d', flex: 3, margin: 'md' as const },
-      { type: 'text' as const, text: value, size: 'xs' as const, color: '#382814', align: 'end' as const, flex: 4, wrap: true },
+      iconCircle(iconUrl, iconBg, '26px', '14px'),
+      {
+        type: 'box' as const, layout: 'vertical' as const, flex: 3, margin: 'sm' as const,
+        contents: [{ type: 'text' as const, text: labelText, size: 'xs' as const, color: '#664719', weight: 'bold' as const, wrap: true }],
+      },
+      { type: 'text' as const, text: value, size: 'xs' as const, color: '#382814', weight: 'bold' as const, align: 'end' as const, flex: 5, wrap: true },
     ],
   })
 
-  // Action box (icon image + label text)
-  const actionBox = (iconUrl: string, text: string, bg: string, action: object, flex = 1) => ({
+  const actionBox = (iconUrl: string, text: string, bg: string, action: object) => ({
     type: 'box' as const,
     layout: 'horizontal' as const,
     backgroundColor: bg,
-    cornerRadius: '10px',
+    borderColor: '#774b25',
+    borderWidth: '1px',
+    cornerRadius: '12px',
     paddingTop: '8px',
     paddingBottom: '8px',
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
-    flex,
+    flex: 1,
     action,
     contents: [
       { type: 'image' as const, url: iconUrl, size: '14px', aspectMode: 'fit' as const, aspectRatio: '1:1', flex: 0 },
-      { type: 'text' as const, text, color: '#ffffff', size: 'xs' as const, margin: 'sm' as const, flex: 0 },
+      { type: 'text' as const, text, color: '#382814', weight: 'bold' as const, size: 'xs' as const, margin: 'sm' as const, flex: 0 },
     ],
   })
 
   const headerRight = {
     type: 'image' as const,
     url: 'https://inc-penses.vercel.app/images/wallet-mascot-line.png',
-    size: '52px',
+    size: '62px',
     aspectMode: 'fit' as const,
     aspectRatio: '1:1',
     flex: 0,
@@ -159,15 +161,11 @@ export function transactionConfirmedFlex(opts: {
         paddingAll: '10px',
         alignItems: 'center' as const,
         contents: [
-          iconCircle(
-            isIncome ? fa('arrow-up', accentClr) : fa('wallet', accentClr),
-            iconBg, '42px', '20px'
-          ),
           {
             type: 'box' as const,
             layout: 'vertical' as const,
             flex: 1,
-            paddingStart: '12px',
+            paddingStart: '4px',
             contents: [
               { type: 'text' as const, text: headerText, size: 'sm' as const, color: '#382814', weight: 'bold' as const, wrap: true },
               {
@@ -196,7 +194,7 @@ export function transactionConfirmedFlex(opts: {
             layout: 'vertical' as const,
             backgroundColor: '#fffdf6',
             borderWidth: '1px',
-            borderColor: '#e2d5b9',
+            borderColor: '#b78654',
             cornerRadius: '12px',
             paddingStart: '12px',
             paddingEnd: '12px',
@@ -204,9 +202,9 @@ export function transactionConfirmedFlex(opts: {
             paddingBottom: '3px',
             contents: [
               row(isIncome ? fa('tag', '4a7c59') : fa('utensils', '4a7c59'), '#d5edd5', labelCategory, opts.category),
-              { type: 'separator' as const, color: '#f0f0f0' },
+              { type: 'separator' as const, color: '#e8d6b6' },
               row(isIncome ? fa('wallet', '7b5ea7') : fa('basket-shopping', '7b5ea7'), '#e8e0f0', labelDescription, opts.note),
-              { type: 'separator' as const, color: '#f0f0f0' },
+              { type: 'separator' as const, color: '#e8d6b6' },
               row(fa('calendar-days', '3a7bc8'), '#dce8f5', labelDate, dateStr),
             ],
           },
@@ -225,31 +223,35 @@ export function transactionConfirmedFlex(opts: {
             layout: 'horizontal' as const,
             spacing: 'md' as const,
             contents: [
-              actionBox(fa('pen-to-square', 'ffffff'), editLabel, '#c98a18', {
+              actionBox(fa('pen-to-square', '382814'), editLabel, '#ffdc70', {
                 type: 'uri',
                 label: editLabel,
                 uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}?page=transactions&edit_tx=${opts.transactionId}&return=chat`,
-              }, 1),
-              actionBox(fa('trash-can', 'ffffff'), cancelLabel, '#cf6255', {
+              }),
+              actionBox(fa('trash-can', '382814'), cancelLabel, '#ffa18e', {
                 type: 'postback',
                 label: cancelLabel,
                 data: `action=delete_tx&id=${opts.transactionId}`,
                 displayText: cancelDisplayText,
-              }, 1),
+              }),
             ],
           },
           {
             type: 'box' as const,
             layout: 'horizontal' as const,
-            paddingTop: '3px',
+            paddingAll: '8px',
             margin: 'xs' as const,
+            backgroundColor: '#e5efc5',
+            cornerRadius: '10px',
             alignItems: 'center' as const,
             contents: [
               {
                 type: 'text' as const,
                 text: `${incomeTotalLabel}: ${totalIncome}`,
                 size: 'xxs' as const,
-                color: '#4a7c59',
+                color: '#365c32',
+                weight: 'bold' as const,
+                wrap: true,
                 flex: 1,
                 align: 'start' as const,
               },
@@ -257,7 +259,9 @@ export function transactionConfirmedFlex(opts: {
                 type: 'text' as const,
                 text: `${expenseTotalLabel}: ${totalExpense}`,
                 size: 'xxs' as const,
-                color: '#d9526b',
+                color: '#9f4035',
+                weight: 'bold' as const,
+                wrap: true,
                 flex: 1,
                 align: 'start' as const,
                 margin: 'lg' as const,
