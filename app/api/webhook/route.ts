@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyLineSignature } from '@/lib/line/verify'
 import { parseMessage } from '@/lib/nlp/parser'
-import { suggestCategory } from '@/lib/nlp/categorize'
+import { categorizeTransactions } from '@/lib/nlp/jev-categorize'
 import {
   replyMessage,
   transactionConfirmedFlex,
@@ -124,15 +124,16 @@ async function handleTextMessage(event: LineTextEvent) {
       await replyMessage(replyToken, [{ type: 'text', text: 'เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ 🙏' }])
       return
     }
-    const { data: categories, error: categoryError } = await supabase.from('categories').select('id, name').eq('profile_id', profile.id)
+    const { data: categories, error: categoryError } = await supabase.from('categories').select('id, name, type').eq('profile_id', profile.id)
     if (categoryError) {
       await replyMessage(replyToken, [{ type: 'text', text: 'เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ 🙏' }])
       return
     }
     const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
-    const rows = transactions.map(tx => ({
+    const selectedCategories = await categorizeTransactions(transactions, categories ?? [])
+    const rows = transactions.map((tx, index) => ({
       profile_id: profile.id,
-      category_id: categories?.find(category => category.name === suggestCategory(tx.note, tx.type))?.id ?? null,
+      category_id: selectedCategories[index]?.id ?? null,
       type: tx.type, amount: tx.amount, note: tx.note, date: tx.date ?? today, input_method: 'manual',
     }))
     const { error } = await supabase.from('transactions').insert(rows)
@@ -178,15 +179,10 @@ async function handleTextMessage(event: LineTextEvent) {
 
   const lang = profile.lang ?? 'th'
 
-  // Find matching category
-  const categoryName = suggestCategory(parsed.note, parsed.type)
-  const { data: category } = await supabase
-    .from('categories')
-    .select('id, name')
-    .eq('profile_id', profile.id)
-    .eq('name', categoryName)
-    .single()
-  console.log('[tx] category:', category?.name ?? 'none')
+  const { data: categories } = await supabase
+    .from('categories').select('id, name, type').eq('profile_id', profile.id)
+  const [category] = await categorizeTransactions([parsed], categories ?? [])
+  const categoryName = category?.name ?? (parsed.type === 'income' ? 'อื่นๆ (รับ)' : 'อื่นๆ (จ่าย)')
 
   // Insert transaction
   const { data: tx, error } = await supabase
@@ -254,10 +250,10 @@ async function handleImageMessage(event: LineImageEvent) {
 
     const lang = profile.lang ?? 'th'
 
-    const categoryName = suggestCategory(slip.note, 'expense')
-    const { data: category } = await supabase
-      .from('categories').select('id, name')
-      .eq('profile_id', profile.id).eq('name', categoryName).single()
+    const { data: categories } = await supabase
+      .from('categories').select('id, name, type').eq('profile_id', profile.id)
+    const [category] = await categorizeTransactions([slip], categories ?? [])
+    const categoryName = category?.name ?? 'อื่นๆ (จ่าย)'
 
     const today = new Date().toISOString().split('T')[0]
     const { data: tx, error } = await supabase

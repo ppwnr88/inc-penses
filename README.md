@@ -97,6 +97,7 @@ lib/
 | `NEXT_PUBLIC_APP_URL` | App base URL | Yes |
 | `LINE_CHANNEL_ACCESS_TOKEN` | LINE Messaging API token for profile fetch, image download, reply, and push | Yes for LINE bot |
 | `LINE_CHANNEL_SECRET` | LINE Messaging API channel secret for webhook signature verification | Yes for LINE bot |
+| `TYPESAFE_API_KEY` | TypeSafe Jev API key for LINE transaction categorization; falls back to keyword rules when unavailable | Optional |
 | `IAPP_API_KEY` | iApp API key for OpenThai 2.0 payment slip OCR | Yes for OpenThai OCR |
 | `GEMINI_API_KEY` | Existing fallback used when IAPP_API_KEY is not configured | Optional |
 | `RESEND_API_KEY` | Resend API key for monthly summary emails | Yes for email summary |
@@ -270,7 +271,7 @@ See:
 ## Security Notes
 
 - `SUPABASE_SERVICE_ROLE_KEY` / Supabase secret key must only be used server-side.
-- `RESEND_API_KEY`, `LINE_CHANNEL_ACCESS_TOKEN`, `LINE_CHANNEL_SECRET`, `IAPP_API_KEY`, `GEMINI_API_KEY`, and `CRON_SECRET` must never be committed.
+- `RESEND_API_KEY`, `LINE_CHANNEL_ACCESS_TOKEN`, `LINE_CHANNEL_SECRET`, `IAPP_API_KEY`, `TYPESAFE_API_KEY`, `GEMINI_API_KEY`, and `CRON_SECRET` must never be committed.
 - Current Supabase RLS policies in the initial migration are permissive for app-level auth. Tighten these before handling sensitive multi-user production data outside trusted server routes.
 - Vercel Cron endpoint is protected by `CRON_SECRET`.
 - Backoffice is protected by `BACKOFFICE_PASSWORD` and a signed httpOnly session cookie.
