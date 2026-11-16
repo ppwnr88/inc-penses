@@ -20,7 +20,7 @@ export function CategoryIcon({ icon, color, size = 'md', className }: CategoryIc
   return (
     <div
       className={twMerge(
-        'flex items-center justify-center rounded-2xl flex-shrink-0',
+        'flex items-center justify-center rounded-2xl border border-[#d5c8aa] flex-shrink-0',
         wrapper,
         className
       )}

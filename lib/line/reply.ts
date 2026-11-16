@@ -51,7 +51,7 @@ export function transactionConfirmedFlex(opts: {
 }) {
   const isIncome  = opts.type === 'income'
   const isEn      = opts.lang === 'en'
-  const accentClr = isIncome ? '#4a7c59' : '#d9526b'
+  const accentClr = isIncome ? '#356c39' : '#a84034'
   const headerBg  = isIncome ? '#e5efc9' : '#ffe2cf'
   const iconBg    = isIncome ? '#c5db9e' : '#ffbfa7'
   const label     = isIncome
@@ -114,8 +114,8 @@ export function transactionConfirmedFlex(opts: {
     alignItems: 'center' as const,
     contents: [
       iconCircle(iconUrl, iconBg, '30px', '15px'),
-      { type: 'text' as const, text: labelText, size: 'xs' as const, color: '#888888', flex: 3, margin: 'md' as const },
-      { type: 'text' as const, text: value, size: 'xs' as const, color: '#1a1a1a', align: 'end' as const, flex: 4, wrap: true },
+      { type: 'text' as const, text: labelText, size: 'xs' as const, color: '#75664d', flex: 3, margin: 'md' as const },
+      { type: 'text' as const, text: value, size: 'xs' as const, color: '#382814', align: 'end' as const, flex: 4, wrap: true },
     ],
   })
 
@@ -137,19 +137,14 @@ export function transactionConfirmedFlex(opts: {
     ],
   })
 
-  const headerRight: object = isIncome
-    ? {
-        type: 'box',
-        layout: 'vertical',
-        width: '20px',
-        justifyContent: 'center',
-        alignItems: 'center',
-        contents: [
-          { type: 'text', text: '✦', size: 'xs', color: accentClr, align: 'center' },
-          { type: 'text', text: '✦', size: 'xxs', color: accentClr, align: 'center' },
-        ],
-      }
-    : iconCircle(fa('arrow-down', accentClr), iconBg, '34px', '15px')
+  const headerRight = {
+    type: 'image' as const,
+    url: 'https://inc-penses.vercel.app/images/wallet-mascot-line.png',
+    size: '52px',
+    aspectMode: 'fit' as const,
+    aspectRatio: '1:1',
+    flex: 0,
+  }
 
   return {
     type: 'flex',
@@ -174,11 +169,12 @@ export function transactionConfirmedFlex(opts: {
             flex: 1,
             paddingStart: '12px',
             contents: [
-              { type: 'text' as const, text: headerText, size: 'xs' as const, color: accentClr },
+              { type: 'text' as const, text: headerText, size: 'sm' as const, color: '#382814', weight: 'bold' as const, wrap: true },
               {
                 type: 'text' as const,
                 text: `${sign}฿${amount}`,
-                size: 'lg' as const,
+                size: 'xl' as const,
+                weight: 'bold' as const,
                 color: accentClr,
                 adjustMode: 'shrink-to-fit' as const,
               },
@@ -199,6 +195,8 @@ export function transactionConfirmedFlex(opts: {
             type: 'box' as const,
             layout: 'vertical' as const,
             backgroundColor: '#fffdf6',
+            borderWidth: '1px',
+            borderColor: '#e2d5b9',
             cornerRadius: '12px',
             paddingStart: '12px',
             paddingEnd: '12px',
@@ -227,12 +225,12 @@ export function transactionConfirmedFlex(opts: {
             layout: 'horizontal' as const,
             spacing: 'md' as const,
             contents: [
-              actionBox(fa('pen-to-square', 'ffffff'), editLabel, '#dba129', {
+              actionBox(fa('pen-to-square', 'ffffff'), editLabel, '#c98a18', {
                 type: 'uri',
                 label: editLabel,
                 uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}?page=transactions&edit_tx=${opts.transactionId}&return=chat`,
               }, 1),
-              actionBox(fa('trash-can', 'ffffff'), cancelLabel, '#ee796c', {
+              actionBox(fa('trash-can', 'ffffff'), cancelLabel, '#cf6255', {
                 type: 'postback',
                 label: cancelLabel,
                 data: `action=delete_tx&id=${opts.transactionId}`,
@@ -284,7 +282,7 @@ export function summaryFlex(opts: {
   const isEn = opts.lang === 'en'
   const fmt = (n: number) => n.toLocaleString('th-TH', { minimumFractionDigits: 0 })
   const balColor = opts.balance >= 0 ? '#2d5c3e' : '#8b2020'
-  const balBg    = opts.balance >= 0 ? '#e1edbf' : '#ffd1bd'
+  const balBg    = opts.balance >= 0 ? '#ffe39a' : '#ffd1bd'
   const balSign  = opts.balance >= 0 ? '+' : ''
 
   const altText = isEn ? `Summary ${opts.month}` : `สรุปเดือน ${opts.month}`
@@ -303,13 +301,17 @@ export function summaryFlex(opts: {
       size: 'mega',
       header: {
         type: 'box',
-        layout: 'vertical',
+        layout: 'horizontal',
+        alignItems: 'center',
         backgroundColor: '#e5efc9',
         paddingAll: '20px',
         paddingBottom: '16px',
         contents: [
-          { type: 'text', text: headerLabel, size: 'xs', color: '#8a7a60', weight: 'bold' as const },
-          { type: 'text', text: opts.month, size: 'xl', weight: 'bold' as const, color: '#3d2e1e' },
+          { type: 'box', layout: 'vertical', flex: 1, contents: [
+            { type: 'text', text: headerLabel, size: 'sm', color: '#536739', weight: 'bold' as const },
+            { type: 'text', text: opts.month, size: 'xl', weight: 'bold' as const, color: '#3d2e1e', wrap: true },
+          ] },
+          { type: 'image', url: 'https://inc-penses.vercel.app/images/wallet-mascot-line.png', size: '64px', aspectMode: 'fit', aspectRatio: '1:1', flex: 0 },
         ],
       },
       body: {
@@ -371,7 +373,7 @@ export function summaryFlex(opts: {
               paddingStart: '16px',
               paddingEnd: '16px',
               contents: [
-                { type: 'text' as const, text: topCatLabel, size: 'xs' as const, color: '#9a8a7a', weight: 'bold' as const, paddingTop: '10px', paddingBottom: '6px' },
+                { type: 'text' as const, text: topCatLabel, size: 'xs' as const, color: '#9a8a7a', weight: 'bold' as const },
                 ...opts.topCategories.slice(0, 3).map((c, i) => ({
                   type: 'box' as const,
                   layout: 'horizontal' as const,
@@ -404,7 +406,7 @@ export function summaryFlex(opts: {
               uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}?page=reports`,
             },
             style: 'primary',
-            color: '#dba129',
+            color: '#bd8015',
           },
         ],
       },

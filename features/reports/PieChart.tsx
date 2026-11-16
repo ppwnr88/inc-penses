@@ -19,7 +19,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload?.length) return null
   const item = payload[0]
   return (
-    <div className="bg-white rounded-xl shadow-card-md p-3 text-sm border border-gray-100">
+    <div className="bg-[#fffdf7] rounded-xl shadow-card-md p-3 text-sm border-2 border-[#dacdac]">
       <p className="font-medium text-gray-800 mb-1">
         {item.payload.category_icon} {item.payload.category_name}
       </p>

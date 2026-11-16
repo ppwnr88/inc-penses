@@ -2,7 +2,7 @@ import React from 'react'
 
 export function Footer() {
   return (
-    <footer className="bg-brand-900 text-brand-200 py-10 px-4">
+    <footer className="bg-[#435c35] text-[#e9efda] py-10 px-4">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
           <div className="text-xl font-bold text-white mb-1">จด</div>

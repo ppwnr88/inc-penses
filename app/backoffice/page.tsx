@@ -66,7 +66,7 @@ function KpiCard({
   }[tone]
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border-2 border-[#dacdac] bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">{label}</p>
@@ -211,7 +211,7 @@ export default function BackofficePage() {
 
   if (sessionState === 'checking') {
     return (
-      <main className="min-h-screen bg-gray-950 text-white">
+      <main className="min-h-screen bg-[#425a34] text-white">
         <div className="flex min-h-screen items-center justify-center">
           <div className="flex items-center gap-3 text-sm text-gray-300">
             <RefreshCw size={18} className="animate-spin" />
@@ -224,9 +224,9 @@ export default function BackofficePage() {
 
   if (sessionState !== 'authenticated') {
     return (
-      <main className="min-h-screen bg-gray-950 px-4 py-10 text-white">
+      <main className="min-h-screen bg-[#425a34] px-4 py-10 text-white">
         <div className="mx-auto flex min-h-[calc(100vh-80px)] max-w-md items-center">
-          <div className="w-full rounded-3xl border border-white/10 bg-white p-6 text-gray-950 shadow-2xl">
+          <div className="w-full rounded-3xl border-2 border-[#dacdac] bg-[#fffdf8] p-6 text-gray-950 shadow-2xl">
             <div className="mb-6">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600">Backoffice</p>
               <h1 className="mt-2 text-2xl font-semibold">จด Admin Console</h1>
@@ -255,7 +255,7 @@ export default function BackofficePage() {
               <button
                 type="submit"
                 disabled={!password || loadingLogin || sessionState === 'unconfigured'}
-                className="flex w-full items-center justify-center rounded-xl bg-gray-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex w-full items-center justify-center rounded-xl border-2 border-[#6b5125] bg-[#f7c94f] px-4 py-2.5 text-sm font-bold text-[#382814] transition-colors hover:bg-[#f2ba37] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loadingLogin ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ Backoffice'}
               </button>
@@ -267,9 +267,9 @@ export default function BackofficePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 text-gray-950">
+    <main className="min-h-screen bg-[#fff8e9] text-gray-950">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <header className="mb-6 flex flex-col gap-4 rounded-3xl bg-gray-950 p-6 text-white shadow-sm md:flex-row md:items-center md:justify-between">
+        <header className="mb-6 flex flex-col gap-4 rounded-3xl bg-[#425a34] p-6 text-white shadow-sm md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">Backoffice</p>
             <h1 className="mt-2 text-2xl font-semibold">จด Admin Console</h1>

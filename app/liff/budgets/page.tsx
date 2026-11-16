@@ -53,7 +53,7 @@ export default function BudgetsPage() {
         rightAction={
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-1 bg-brand-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl"
+            className="flex items-center gap-1 bg-[#f7c94f] text-[#382814] border-2 border-[#aa8739] text-xs font-bold px-3 py-1.5 rounded-xl shadow-[0_3px_0_#d2ad50]"
           >
             <Plus size={14} />
             {t.budgets.add}

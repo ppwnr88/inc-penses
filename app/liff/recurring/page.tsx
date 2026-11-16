@@ -75,10 +75,10 @@ function RecurringForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="flex bg-gray-100 rounded-2xl p-1 gap-1">
+      <div className="flex bg-[#eee6d3] border border-[#ded1b4] rounded-2xl p-1 gap-1">
         {(['expense', 'income'] as const).map(tp => (
           <button key={tp} type="button" onClick={() => { setValue('type', tp); setValue('category_id', '') }}
-            className={`flex-1 py-2 text-sm font-medium rounded-xl transition-all ${activeType === tp ? 'bg-white shadow-sm text-brand-700' : 'text-gray-500'}`}>
+            className={`flex-1 py-2 text-sm font-medium rounded-xl transition-all ${activeType === tp ? 'bg-[#e1edbf] shadow-sm text-[#314925]' : 'text-gray-500'}`}>
             {tp === 'income' ? t.recurring.incomeBtn : t.recurring.expenseBtn}
           </button>
         ))}
@@ -204,7 +204,7 @@ export default function RecurringPage() {
     <div className="page-container pt-0 space-y-3">
       <Header title={t.recurring.title} rightAction={
         <button onClick={() => setShowForm(true)}
-          className="flex items-center gap-1 bg-brand-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl">
+          className="flex items-center gap-1 bg-[#f7c94f] text-[#382814] border-2 border-[#aa8739] text-xs font-bold px-3 py-1.5 rounded-xl shadow-[0_3px_0_#d2ad50]">
           <Plus size={14} />{t.recurring.add}
         </button>
       } />
@@ -255,15 +255,15 @@ export default function RecurringPage() {
                     <AmountDisplay amount={item.amount} type={item.type} size="sm" />
                     <div className="flex gap-1">
                       <button onClick={() => toggleActive(item)}
-                        className="p-1.5 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-brand-600 transition-colors">
+                        className="p-2 rounded-xl bg-[#edf2d4] text-[#4e693c] hover:bg-[#dceabb] transition-colors">
                         {item.is_active ? <Pause size={13} /> : <Play size={13} />}
                       </button>
                       <button onClick={() => setEditing(item)}
-                        className="p-1.5 rounded-xl hover:bg-brand-50 text-gray-400 hover:text-brand-600 transition-colors">
+                        className="p-2 rounded-xl bg-[#f3ecd8] text-[#65583f] hover:bg-[#e5edcf] transition-colors">
                         <Pencil size={13} />
                       </button>
                       <button onClick={() => handleDelete(item.id)}
-                        className="p-1.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+                        className="p-2 rounded-xl bg-[#ffebe1] text-[#a24839] hover:bg-[#ffd5c6] transition-colors">
                         <Trash2 size={13} />
                       </button>
                     </div>

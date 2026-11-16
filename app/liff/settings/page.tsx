@@ -161,9 +161,12 @@ export default function SettingsPage() {
               <p className="text-xs text-gray-400">{t.settings.dailyNotifyDesc}</p>
             </div>
             <button
+              role="switch"
+              aria-checked={notifyEnabled}
+              aria-label={t.settings.dailyNotify}
               onClick={() => setNotifyEnabled(!notifyEnabled)}
               className={`relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                notifyEnabled ? 'bg-brand-500' : 'bg-gray-300'
+                notifyEnabled ? 'bg-[#719950]' : 'bg-[#c9bea9]'
               }`}
             >
               <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md ring-0 transition-transform duration-200 ease-in-out ${
@@ -199,9 +202,12 @@ export default function SettingsPage() {
             </div>
             <button
               type="button"
+              role="switch"
+              aria-checked={monthlySummaryEnabled}
+              aria-label={t.settings.monthlySummaryToggle}
               onClick={() => setMonthlySummaryEnabled(!monthlySummaryEnabled)}
               className={`relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                monthlySummaryEnabled ? 'bg-brand-500' : 'bg-gray-300'
+                monthlySummaryEnabled ? 'bg-[#719950]' : 'bg-[#c9bea9]'
               }`}
             >
               <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md ring-0 transition-transform duration-200 ease-in-out ${
@@ -254,11 +260,11 @@ export default function SettingsPage() {
           <div className="flex gap-2">
             <button
               onClick={() => handleLangChange('th')}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${lang === 'th' ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200'}`}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${lang === 'th' ? 'bg-[#dceabb] text-[#314925] border-[#829d63] font-bold shadow-[0_3px_0_#b4c797]' : 'bg-[#fffdf7] text-[#685a43] border-[#dacdac]'}`}
             >ไทย</button>
             <button
               onClick={() => handleLangChange('en')}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${lang === 'en' ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200'}`}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${lang === 'en' ? 'bg-[#dceabb] text-[#314925] border-[#829d63] font-bold shadow-[0_3px_0_#b4c797]' : 'bg-[#fffdf7] text-[#685a43] border-[#dacdac]'}`}
             >English</button>
           </div>
         </Card>
@@ -296,14 +302,14 @@ export default function SettingsPage() {
               type="date"
               value={deleteFrom}
               onChange={e => setDeleteFrom(e.target.value)}
-              className="flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+              className="min-w-0 w-full flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
             />
             <span className="self-center text-gray-400 text-xs">{t.settings.to}</span>
             <input
               type="date"
               value={deleteTo}
               onChange={e => setDeleteTo(e.target.value)}
-              className="flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+              className="min-w-0 w-full flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
             />
           </div>
           <button

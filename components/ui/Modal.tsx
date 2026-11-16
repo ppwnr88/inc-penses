@@ -49,20 +49,20 @@ export function Modal({
       />
       <div
         className={twMerge(
-          'relative bg-white w-full rounded-t-3xl sm:rounded-2xl shadow-xl animate-slide-up',
+          'relative bg-[#fffaf0] border-2 border-[#b7a986] w-full rounded-t-3xl sm:rounded-2xl shadow-xl animate-slide-up',
           'max-h-[90vh] overflow-y-auto',
           sizeClasses[size]
         )}
       >
         {(title || showClose) && (
-          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <div className="flex items-center justify-between p-4 border-b-2 border-[#e5d9be]">
             {title && (
-              <h2 className="text-base font-semibold text-gray-800">{title}</h2>
+              <h2 className="text-lg font-bold text-[#382814]">{title}</h2>
             )}
             {showClose && (
               <button
                 onClick={onClose}
-                className="ml-auto p-1.5 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors"
+                className="ml-auto p-2 rounded-xl bg-[#f0e7d4] hover:bg-[#e7ddc5] text-[#65583f] transition-colors"
               >
                 <X size={18} />
               </button>

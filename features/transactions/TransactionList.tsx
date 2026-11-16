@@ -34,9 +34,9 @@ function getDateLabel(
 function DateSeparator({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-2 px-2 py-1.5">
-      <div className="h-px flex-1 bg-gray-200" />
-      <span className="text-xs font-medium text-gray-500 shrink-0">{label}</span>
-      <div className="h-px flex-1 bg-gray-200" />
+      <div className="h-px flex-1 bg-[#dfd2b5]" />
+      <span className="text-xs font-bold text-[#75664d] shrink-0">{label}</span>
+      <div className="h-px flex-1 bg-[#dfd2b5]" />
     </div>
   )
 }
@@ -58,7 +58,7 @@ export function TransactionList({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-card divide-y divide-gray-50">
+      <div className="bg-[#fffdf8] border-2 border-[#dacdac] rounded-2xl shadow-card divide-y divide-[#eee4cf] overflow-hidden">
         {Array.from({ length: 5 }).map((_, i) => (
           <TransactionSkeleton key={i} />
         ))}
@@ -87,7 +87,7 @@ export function TransactionList({
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       {groups.map(group => (
         <React.Fragment key={group.date}>
           <DateSeparator
@@ -100,7 +100,7 @@ export function TransactionList({
               yesterdayStr,
             )}
           />
-          <div className="bg-white rounded-2xl shadow-card divide-y divide-gray-50">
+          <div className="bg-[#fffdf8] border-2 border-[#dacdac] rounded-2xl shadow-card divide-y divide-[#eee4cf] overflow-hidden">
             {group.items.map(transaction => (
               <TransactionCard
                 key={transaction.id}

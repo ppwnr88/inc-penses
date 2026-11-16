@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 export function LoadingScreen() {
   const [isEn, setIsEn] = useState(false)
@@ -12,7 +13,8 @@ export function LoadingScreen() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-cream-50">
       <div className="flex flex-col items-center gap-4">
-        <div className="text-4xl font-bold text-brand-600 tracking-tight">
+        <Image src="/images/wallet-mascot.webp" width={112} height={112} alt="" aria-hidden="true" className="w-24 h-24 object-contain" />
+        <div className="text-4xl font-bold text-[#382814] tracking-tight">
           {isEn ? 'Record' : 'จด'}
         </div>
         <div className="flex gap-1.5">

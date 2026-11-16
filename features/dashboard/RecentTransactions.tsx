@@ -32,7 +32,7 @@ export function RecentTransactions({ transactions, loading, onAddFirst }: Recent
       </div>
 
       {loading ? (
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-[#eee4cf]">
           {Array.from({ length: 4 }).map((_, i) => <TransactionSkeleton key={i} />)}
         </div>
       ) : transactions.length === 0 ? (
@@ -43,7 +43,7 @@ export function RecentTransactions({ transactions, loading, onAddFirst }: Recent
           action={onAddFirst ? { label: t.dashboard.addFirst, onClick: onAddFirst } : undefined}
         />
       ) : (
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-[#eee4cf]">
           {transactions.slice(0, 5).map(tx => (
             <TransactionCard key={tx.id} transaction={tx} />
           ))}

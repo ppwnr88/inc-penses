@@ -83,3 +83,14 @@
   outline: 3px solid #bb8a2f;
   outline-offset: 2px;
 }
+
+/* Keep secondary text readable across every LIFF screen. */
+.liff-theme .text-gray-300,
+.liff-theme .text-gray-400 { color: #766b5b; }
+.liff-theme .text-gray-500 { color: #6a5d49; }
+.liff-theme .text-gray-600 { color: #5f523e; }
+.liff-theme .text-gray-700,
+.liff-theme .text-gray-800,
+.liff-theme .text-gray-900 { color: #382814; }
+.liff-theme .no-scrollbar { scrollbar-width: none; }
+.liff-theme .no-scrollbar::-webkit-scrollbar { display: none; }

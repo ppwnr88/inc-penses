@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { LandingNav } from '@/components/layout/LandingNav'
 import { Footer } from '@/components/layout/Footer'
@@ -89,12 +90,13 @@ const steps = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-cream-50">
+    <div className="min-h-screen bg-[#fff8e9]">
       <LandingNav />
 
       {/* Hero */}
       <section className="pt-28 pb-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
+          <Image src="/images/wallet-mascot.webp" width={112} height={112} alt="" aria-hidden="true" className="w-28 h-28 object-contain mx-auto mb-3" />
           <div className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-xs font-medium px-3 py-1.5 rounded-full mb-6">
             <span>✨</span>
             <span>ผู้ช่วยจดรายรับรายจ่ายส่วนตัว ผ่าน LINE</span>
@@ -111,7 +113,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/liff"
-              className="inline-flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold px-8 py-3.5 rounded-2xl transition-colors text-base shadow-sm"
+              className="inline-flex items-center justify-center gap-2 bg-[#f7c94f] hover:bg-[#f2ba37] text-[#382814] border-2 border-[#6b5125] font-bold px-8 py-3.5 rounded-2xl transition-colors text-base shadow-sm"
             >
               เริ่มใช้งานฟรี →
             </Link>
@@ -154,7 +156,7 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {steps.map((step, i) => (
-              <div key={i} className="relative bg-white rounded-3xl p-6 shadow-card text-center">
+              <div key={i} className="relative bg-[#fffdf8] border-2 border-[#dacdac] rounded-3xl p-6 shadow-card text-center">
                 <div className="w-8 h-8 bg-brand-500 text-white rounded-full flex items-center justify-center text-sm font-bold mx-auto mb-4">
                   {step.step}
                 </div>

@@ -45,7 +45,7 @@ export function ProgressBar({
           </span>
         </div>
       )}
-      <div className={twMerge('w-full bg-gray-100 rounded-full overflow-hidden', sizeMap[size])}>
+      <div className={twMerge('w-full bg-[#eee3c9] rounded-full overflow-hidden', sizeMap[size])}>
         <div
           className={twMerge('rounded-full transition-all duration-500', colorClass, sizeMap[size])}
           style={{ width: `${percent}%` }}

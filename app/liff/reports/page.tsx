@@ -54,7 +54,7 @@ export default function ReportsPage() {
 
       <div className="pt-3 space-y-4">
         {/* Month Selector */}
-        <div className="flex items-center justify-between bg-white rounded-2xl shadow-card px-4 py-3">
+        <div className="flex items-center justify-between bg-[#fffdf8] border-2 border-[#dacdac] rounded-2xl shadow-card px-4 py-3">
           <button onClick={prevMonth} className="p-1.5 rounded-xl hover:bg-gray-100 text-gray-600 transition-colors">
             <ChevronLeft size={18} />
           </button>

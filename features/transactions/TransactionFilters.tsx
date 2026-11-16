@@ -35,10 +35,10 @@ export function TransactionFilters({
               onFilterChange({ ...filters, type: opt.value as TransactionFilters['type'] })
             }
             className={twMerge(
-              'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all',
+              'flex-shrink-0 px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all',
               filters.type === opt.value || (!filters.type && opt.value === 'all')
-                ? 'bg-brand-500 text-white'
-                : 'bg-white text-gray-600 border border-gray-200'
+                ? 'bg-[#dceabb] text-[#314925] border-[#829d63] shadow-[0_3px_0_#b4c797]'
+                : 'bg-[#fffdf7] text-[#685a43] border-[#e3d8bf]'
             )}
           >
             {opt.label}
@@ -51,10 +51,10 @@ export function TransactionFilters({
         <button
           onClick={() => onFilterChange({ ...filters, category_id: undefined })}
           className={twMerge(
-            'flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-all',
+            'flex-shrink-0 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all',
             !filters.category_id
-              ? 'bg-brand-100 text-brand-700'
-              : 'bg-white text-gray-500 border border-gray-200'
+              ? 'bg-[#ffe49b] text-[#60430f] border-[#d9b65b]'
+              : 'bg-[#fffdf7] text-[#685a43] border-[#e3d8bf]'
           )}
         >
           {t.common.allCategories}
@@ -64,10 +64,10 @@ export function TransactionFilters({
             key={cat.id}
             onClick={() => onFilterChange({ ...filters, category_id: cat.id })}
             className={twMerge(
-              'flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-all whitespace-nowrap',
+              'flex-shrink-0 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all whitespace-nowrap',
               filters.category_id === cat.id
-                ? 'bg-brand-100 text-brand-700'
-                : 'bg-white text-gray-500 border border-gray-200'
+                ? 'bg-[#ffe49b] text-[#60430f] border-[#d9b65b]'
+                : 'bg-[#fffdf7] text-[#685a43] border-[#e3d8bf]'
             )}
           >
             {cat.icon} {cat.name}

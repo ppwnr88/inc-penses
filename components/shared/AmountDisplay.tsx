@@ -35,10 +35,10 @@ export function AmountDisplay({
   return (
     <span
       className={twMerge(
-        'font-medium tabular-nums',
+        'font-bold tabular-nums',
         sizeMap[size],
-        isIncome && 'text-green-600',
-        isExpense && 'text-red-500',
+        isIncome && 'text-[#397441]',
+        isExpense && 'text-[#bb473b]',
         !type && 'text-gray-800',
         className
       )}

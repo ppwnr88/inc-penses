@@ -46,7 +46,7 @@ export default function CategoriesPage() {
         rightAction={
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-1 bg-brand-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl"
+            className="flex items-center gap-1 bg-[#f7c94f] text-[#382814] border-2 border-[#aa8739] text-xs font-bold px-3 py-1.5 rounded-xl shadow-[0_3px_0_#d2ad50]"
           >
             <Plus size={14} />
             {t.categories.add}
@@ -56,14 +56,14 @@ export default function CategoriesPage() {
 
       <div className="pt-3 space-y-3">
         {/* Tabs */}
-        <div className="flex bg-gray-100 rounded-2xl p-1 gap-1">
+        <div className="flex bg-[#eee6d3] border border-[#ded1b4] rounded-2xl p-1 gap-1">
           {(['expense', 'income'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={twMerge(
                 'flex-1 py-2 text-sm font-medium rounded-xl transition-all',
-                activeTab === tab ? 'bg-white shadow-sm text-brand-700' : 'text-gray-500'
+                activeTab === tab ? 'bg-[#e1edbf] shadow-sm text-[#314925]' : 'text-gray-500'
               )}
             >
               {tab === 'expense' ? t.categories.expense : t.categories.income}

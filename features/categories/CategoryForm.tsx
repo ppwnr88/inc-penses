@@ -66,14 +66,14 @@ export function CategoryForm({ onSubmit, onCancel, defaultValues, isEditing = fa
 
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
-      <div className="flex bg-gray-100 rounded-2xl p-1 gap-1">
+      <div className="flex bg-[#eee6d3] border border-[#ded1b4] rounded-2xl p-1 gap-1">
         {(['expense', 'income'] as const).map(type => (
           <button
             key={type}
             type="button"
             onClick={() => setValue('type', type)}
             className={`flex-1 py-2 text-sm font-medium rounded-xl transition-all ${
-              watch('type') === type ? 'bg-white shadow-sm text-brand-700' : 'text-gray-500'
+              watch('type') === type ? 'bg-[#e1edbf] shadow-sm text-[#314925]' : 'text-gray-500'
             }`}
           >
             {type === 'income' ? t.categories.income : t.categories.expense}
@@ -97,7 +97,7 @@ export function CategoryForm({ onSubmit, onCancel, defaultValues, isEditing = fa
               type="button"
               onClick={() => setValue('icon', icon)}
               className={`aspect-square flex items-center justify-center text-xl rounded-xl transition-all ${
-                selectedIcon === icon ? 'bg-brand-100 ring-2 ring-brand-400' : 'hover:bg-gray-100'
+                selectedIcon === icon ? 'bg-[#ffe39a] ring-2 ring-[#c79b34]' : 'hover:bg-[#eee6d3]'
               }`}
             >
               {icon}

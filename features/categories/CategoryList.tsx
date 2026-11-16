@@ -16,7 +16,7 @@ interface CategoryListProps {
 }
 
 export function CategoryList({ categories, loading, onEdit, onDelete }: CategoryListProps) {
-  const { t } = usePreferences()
+  const { t, lang } = usePreferences()
 
   if (loading) {
     return (
@@ -50,7 +50,7 @@ export function CategoryList({ categories, loading, onEdit, onDelete }: Category
       {categories.map(cat => (
         <div
           key={cat.id}
-          className="flex items-center gap-3 bg-white rounded-2xl p-3 shadow-card"
+          className="flex items-center gap-3 bg-[#fffdf8] border-2 border-[#dacdac] rounded-2xl p-3 shadow-card"
         >
           <CategoryIcon icon={cat.icon} color={cat.color} size="md" />
           <div className="flex-1">
@@ -61,15 +61,17 @@ export function CategoryList({ categories, loading, onEdit, onDelete }: Category
           </div>
           <div className="flex gap-1">
             <button
+              aria-label={lang === 'en' ? 'Edit' : 'แก้ไข'}
               onClick={() => onEdit(cat)}
-              className="p-2 rounded-xl hover:bg-brand-50 text-gray-400 hover:text-brand-600 transition-colors"
+              className="p-2 rounded-xl bg-[#f3ecd8] text-[#65583f] hover:bg-[#e5edcf] transition-colors"
             >
               <Pencil size={15} />
             </button>
             {!cat.is_default && (
               <button
+                aria-label={lang === 'en' ? 'Delete' : 'ลบ'}
                 onClick={() => onDelete(cat.id)}
-                className="p-2 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                className="p-2 rounded-xl bg-[#ffebe1] text-[#a24839] hover:bg-[#ffd5c6] transition-colors"
               >
                 <Trash2 size={15} />
               </button>

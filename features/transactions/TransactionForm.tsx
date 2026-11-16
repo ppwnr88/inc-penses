@@ -101,7 +101,7 @@ export function TransactionForm({
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       {/* Type Toggle */}
-      <div className="flex bg-gray-100 rounded-2xl p-1 gap-1">
+      <div className="flex bg-[#eee6d3] border border-[#ded1b4] rounded-2xl p-1 gap-1">
         {(['expense', 'income'] as const).map(type => (
           <button
             key={type}
@@ -111,8 +111,8 @@ export function TransactionForm({
               'flex-1 py-2 text-sm font-medium rounded-xl transition-all duration-150',
               activeType === type
                 ? type === 'income'
-                  ? 'bg-white text-green-600 shadow-sm'
-                  : 'bg-white text-red-500 shadow-sm'
+                  ? 'bg-[#dceabb] text-[#355222] shadow-sm'
+                  : 'bg-[#ffd1bd] text-[#9b3f2f] shadow-sm'
                 : 'text-gray-500'
             )}
           >
@@ -122,7 +122,7 @@ export function TransactionForm({
       </div>
 
       {/* Input Method Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+      <div className="flex gap-1 bg-[#eee6d3] border border-[#ded1b4] rounded-xl p-1">
         {([
           { id: 'manual' as const, icon: Keyboard, label: t.form.manual },
           { id: 'voice' as const, icon: Mic, label: t.form.voice },
@@ -135,7 +135,7 @@ export function TransactionForm({
             className={twMerge(
               'flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium rounded-lg transition-all',
               activeTab === tab.id
-                ? 'bg-white text-brand-700 shadow-sm'
+                ? 'bg-[#fffdf7] text-[#314925] shadow-sm'
                 : 'text-gray-400'
             )}
           >

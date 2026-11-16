@@ -88,7 +88,7 @@ const features = [
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-cream-50">
+    <div className="min-h-screen bg-[#fff8e9]">
       <LandingNav />
 
       <section className="pt-28 pb-12 px-4 text-center">
@@ -109,7 +109,7 @@ export default function FeaturesPage() {
           {features.map((f, i) => (
             <div
               key={i}
-              className={`${f.color} rounded-3xl p-6 flex flex-col gap-3 hover:shadow-card-md transition-shadow`}
+              className={`${f.color} border-2 border-[#dacdac] rounded-3xl p-6 flex flex-col gap-3 hover:shadow-card-md transition-shadow`}
             >
               <div className="text-4xl">{f.icon}</div>
               <div>

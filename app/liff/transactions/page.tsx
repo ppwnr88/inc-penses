@@ -151,7 +151,7 @@ export default function TransactionsPage() {
       {/* FAB */}
       <button
         onClick={() => setShowForm(true)}
-        className="fixed bottom-20 right-4 w-14 h-14 bg-brand-500 hover:bg-brand-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all active:scale-95 z-30"
+        className="fixed bottom-20 right-4 w-14 h-14 bg-[#f7c94f] hover:bg-[#f2ba37] text-[#382814] border-2 border-[#6b5125] rounded-full shadow-[0_4px_0_#c79b34] flex items-center justify-center transition-all active:scale-95 z-30"
       >
         <Plus size={26} strokeWidth={2.5} />
       </button>

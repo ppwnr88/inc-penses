@@ -15,13 +15,13 @@ interface BudgetCardProps {
 }
 
 export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
-  const { t, currencySymbol } = usePreferences()
+  const { t, lang, currencySymbol } = usePreferences()
   const spent = budget.spent ?? 0
   const remaining = budget.amount - spent
   const isOver = spent > budget.amount
 
   return (
-    <div className="bg-white rounded-2xl shadow-card p-4">
+    <div className="bg-[#fffdf8] border-2 border-[#dacdac] rounded-2xl shadow-card p-4">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <CategoryIcon
@@ -40,14 +40,16 @@ export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
         </div>
         <div className="flex gap-1">
           <button
+            aria-label={lang === 'en' ? 'Edit' : 'แก้ไข'}
             onClick={() => onEdit(budget)}
-            className="p-1.5 rounded-xl hover:bg-brand-50 text-gray-400 hover:text-brand-600 transition-colors"
+            className="p-2 rounded-xl bg-[#f3ecd8] text-[#65583f] hover:bg-[#e5edcf] transition-colors"
           >
             <Pencil size={14} />
           </button>
           <button
+            aria-label={lang === 'en' ? 'Delete' : 'ลบ'}
             onClick={() => onDelete(budget.id)}
-            className="p-1.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+            className="p-2 rounded-xl bg-[#ffebe1] text-[#a24839] hover:bg-[#ffd5c6] transition-colors"
           >
             <Trash2 size={14} />
           </button>
