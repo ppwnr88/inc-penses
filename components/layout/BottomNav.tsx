@@ -19,7 +19,7 @@ export function BottomNav() {
   ]
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 safe-area-pb z-40">
+    <nav className="fixed bottom-0 inset-x-0 bg-[#fff8e9] border-t-2 border-[#dfd1ae] safe-area-pb z-40">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href
@@ -30,8 +30,8 @@ export function BottomNav() {
               className={twMerge(
                 'flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-150',
                 isActive
-                  ? 'text-brand-600'
-                  : 'text-gray-400 hover:text-brand-400'
+                  ? 'bg-[#e1edbf] text-[#355824] shadow-[0_2px_0_#b8c997]'
+                  : 'text-[#756a56] hover:text-brand-700'
               )}
             >
               <Icon

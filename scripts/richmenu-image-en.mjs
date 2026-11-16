@@ -20,8 +20,8 @@ const PAD = 22
 const BR = 44  // button corner radius
 
 // ── Palette — Earth Tone Pastel ────────────────────────────────────────────
-const BG       = '#f2ece0'   // warm cream
-const DIVIDER  = '#d6c9b0'
+const BG       = '#fff8e9'   // warm cream
+const DIVIDER  = '#d8c99f'
 const WHITE    = '#ffffff'
 const DARK     = '#3d2e1e'   // warm dark brown for text
 const SAGE     = '#6b8f5e'   // medium sage
@@ -46,7 +46,7 @@ function card(col, row) {
   const x = LEFT_W + col * BW + PAD
   const y = row * BH + PAD
   const b = BTNS[row * COLS + col]
-  return `<rect x="${x}" y="${y}" width="${BW - PAD*2}" height="${BH - PAD*2}" fill="${b.bg}" rx="${BR}"/>`
+  return `<rect x="${x}" y="${y}" width="${BW - PAD*2}" height="${BH - PAD*2}" fill="${b.bg}" rx="${BR}" stroke="#cdbd97" stroke-width="4"/>`
 }
 
 // Icon circle behind icon
@@ -170,7 +170,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" 
     fill="${SAGE}" text-anchor="middle" opacity="0.85">Income · Expense · Budget</text>
 
   <!-- Decorative circles + wallet icon -->
-  ${circles()}
+
 
   <!-- Bottom hint — text only -->
   <text x="${LEFT_W/2}" y="1530"
@@ -216,7 +216,9 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" 
 
 writeFileSync(path.join(__dirname, 'richmenu-en.svg'), svg)
 
+const mascot = await sharp(path.join(__dirname, '../public/images/wallet-mascot.webp')).resize({ width: 640, height: 640, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).toBuffer()
 await sharp(Buffer.from(svg))
+  .composite([{ input: mascot, left: 160, top: 700 }])
   .jpeg({ quality: 94 })
   .toFile(OUT)
 

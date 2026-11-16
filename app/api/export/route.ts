@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
   }
 
   if (type === 'excel') {
-    const XLSX = await import('xlsx')
+    const ExcelJS = await import('exceljs')
 
     const headers = ['วันที่', 'ประเภท', 'หมวดหมู่', 'จำนวนเงิน (บาท)', 'หมายเหตุ', 'วิธีบันทึก']
     const rows = transactions.map(t => [
@@ -100,13 +100,11 @@ export async function GET(req: NextRequest) {
       ['คงเหลือ', '', '', totalIncome - totalExpense, '', ''],
     ]
 
-    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows, ...summaryRows])
-    ws['!cols'] = [{ wch: 12 }, { wch: 10 }, { wch: 18 }, { wch: 16 }, { wch: 30 }, { wch: 14 }]
-
-    const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, 'รายการ')
-
-    const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
+    const workbook = new ExcelJS.Workbook()
+    const sheet = workbook.addWorksheet('รายการ')
+    sheet.addRows([headers, ...rows, ...summaryRows])
+    sheet.columns = [12, 10, 18, 16, 30, 14].map(width => ({ width }))
+    const buffer = Buffer.from(await workbook.xlsx.writeBuffer())
 
     return new NextResponse(buffer, {
       headers: {

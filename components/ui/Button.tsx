@@ -16,13 +16,13 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<Variant, string> = {
   primary:
-    'bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white shadow-sm',
+    'bg-[#f7c94f] hover:bg-[#f2ba37] active:bg-[#e7ae2e] text-[#3c2a12] border-2 border-[#6b5125] shadow-[0_3px_0_#c79b34]',
   secondary:
-    'bg-brand-100 hover:bg-brand-200 active:bg-brand-300 text-brand-800',
+    'bg-[#dceabb] hover:bg-[#cbdca5] active:bg-brand-300 text-[#314925] border-2 border-[#95ad72]',
   ghost:
     'bg-transparent hover:bg-brand-50 active:bg-brand-100 text-brand-700 border border-brand-200',
   danger:
-    'bg-red-500 hover:bg-red-600 active:bg-red-700 text-white shadow-sm',
+    'bg-[#ef796b] hover:bg-red-500 active:bg-red-700 text-white border-2 border-[#a14b40] shadow-[0_3px_0_#b85c50]',
 }
 
 const sizeStyles: Record<Size, string> = {
@@ -48,7 +48,7 @@ export function Button({
       disabled={disabled || loading}
       className={twMerge(
         clsx(
-          'relative inline-flex items-center justify-center overflow-hidden font-medium transition-all duration-150',
+          'relative inline-flex items-center justify-center overflow-hidden font-bold transition-all duration-150',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           variantStyles[variant],

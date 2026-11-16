@@ -19,7 +19,7 @@ export function RecentTransactions({ transactions, loading, onAddFirst }: Recent
   const { t } = usePreferences()
 
   return (
-    <div className="bg-white rounded-2xl shadow-card overflow-hidden">
+    <div className="bg-white rounded-2xl border-2 border-[#dacdac] shadow-card overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
         <h3 className="text-sm font-semibold text-gray-800">{t.dashboard.recentTitle}</h3>
         <Link

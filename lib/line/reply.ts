@@ -52,8 +52,8 @@ export function transactionConfirmedFlex(opts: {
   const isIncome  = opts.type === 'income'
   const isEn      = opts.lang === 'en'
   const accentClr = isIncome ? '#4a7c59' : '#d9526b'
-  const headerBg  = isIncome ? '#edf7ed' : '#fdeef0'
-  const iconBg    = isIncome ? '#c8e6ca' : '#f9c7cf'
+  const headerBg  = isIncome ? '#e5efc9' : '#ffe2cf'
+  const iconBg    = isIncome ? '#c5db9e' : '#ffbfa7'
   const label     = isIncome
     ? (isEn ? 'Income' : 'รายรับ')
     : (isEn ? 'Expense' : 'รายจ่าย')
@@ -190,7 +190,7 @@ export function transactionConfirmedFlex(opts: {
       body: {
         type: 'box',
         layout: 'vertical' as const,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#fff8e9',
         paddingAll: '10px',
         paddingTop: '6px',
         spacing: 'none' as const,
@@ -198,7 +198,7 @@ export function transactionConfirmedFlex(opts: {
           {
             type: 'box' as const,
             layout: 'vertical' as const,
-            backgroundColor: '#ffffff',
+            backgroundColor: '#fffdf6',
             cornerRadius: '12px',
             paddingStart: '12px',
             paddingEnd: '12px',
@@ -218,7 +218,7 @@ export function transactionConfirmedFlex(opts: {
         type: 'box',
         layout: 'vertical' as const,
         spacing: 'xs' as const,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#fff8e9',
         paddingAll: '10px',
         paddingTop: '4px',
         contents: [
@@ -227,12 +227,12 @@ export function transactionConfirmedFlex(opts: {
             layout: 'horizontal' as const,
             spacing: 'md' as const,
             contents: [
-              actionBox(fa('pen-to-square', 'ffffff'), editLabel, '#d99a2b', {
+              actionBox(fa('pen-to-square', 'ffffff'), editLabel, '#dba129', {
                 type: 'uri',
                 label: editLabel,
                 uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}?page=transactions&edit_tx=${opts.transactionId}&return=chat`,
               }, 1),
-              actionBox(fa('trash-can', 'ffffff'), cancelLabel, '#e8837a', {
+              actionBox(fa('trash-can', 'ffffff'), cancelLabel, '#ee796c', {
                 type: 'postback',
                 label: cancelLabel,
                 data: `action=delete_tx&id=${opts.transactionId}`,
@@ -284,7 +284,7 @@ export function summaryFlex(opts: {
   const isEn = opts.lang === 'en'
   const fmt = (n: number) => n.toLocaleString('th-TH', { minimumFractionDigits: 0 })
   const balColor = opts.balance >= 0 ? '#2d5c3e' : '#8b2020'
-  const balBg    = opts.balance >= 0 ? '#ddebd5' : '#f5dada'
+  const balBg    = opts.balance >= 0 ? '#e1edbf' : '#ffd1bd'
   const balSign  = opts.balance >= 0 ? '+' : ''
 
   const altText = isEn ? `Summary ${opts.month}` : `สรุปเดือน ${opts.month}`
@@ -304,7 +304,7 @@ export function summaryFlex(opts: {
       header: {
         type: 'box',
         layout: 'vertical',
-        backgroundColor: '#e8dfc8',
+        backgroundColor: '#e5efc9',
         paddingAll: '20px',
         paddingBottom: '16px',
         contents: [
@@ -315,7 +315,7 @@ export function summaryFlex(opts: {
       body: {
         type: 'box',
         layout: 'vertical',
-        backgroundColor: '#faf8f4',
+        backgroundColor: '#fff8e9',
         paddingAll: '20px',
         paddingTop: '16px',
         spacing: 'md',
@@ -328,7 +328,7 @@ export function summaryFlex(opts: {
             contents: [
               {
                 type: 'box', layout: 'vertical', flex: 1,
-                backgroundColor: '#ddebd5',
+                backgroundColor: '#e1edbf',
                 cornerRadius: '12px',
                 paddingAll: '14px',
                 contents: [
@@ -338,7 +338,7 @@ export function summaryFlex(opts: {
               },
               {
                 type: 'box', layout: 'vertical', flex: 1,
-                backgroundColor: '#f5dada',
+                backgroundColor: '#ffd1bd',
                 cornerRadius: '12px',
                 paddingAll: '14px',
                 contents: [
@@ -392,7 +392,7 @@ export function summaryFlex(opts: {
       footer: {
         type: 'box',
         layout: 'vertical',
-        backgroundColor: '#faf8f4',
+        backgroundColor: '#fff8e9',
         paddingAll: '16px',
         paddingTop: '8px',
         contents: [
@@ -404,7 +404,7 @@ export function summaryFlex(opts: {
               uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}?page=reports`,
             },
             style: 'primary',
-            color: '#6b8f5e',
+            color: '#dba129',
           },
         ],
       },

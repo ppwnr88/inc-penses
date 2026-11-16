@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@config "../tailwind.config.ts";
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -59,4 +58,28 @@
 /* Recharts fix */
 .recharts-wrapper {
   font-family: var(--font-sans) !important;
+}
+
+/* A warm, illustrated visual language for the LINE app. */
+.liff-theme {
+  background: #fff8e9;
+  color: #382814;
+}
+.liff-theme .page-container {
+  padding-top: 1rem;
+}
+.liff-theme .section-title {
+  color: #74664c;
+  font-weight: 700;
+}
+.liff-theme input:not([type='checkbox']):not([type='radio']),
+.liff-theme select,
+.liff-theme textarea {
+  border-color: #d8c9aa;
+  background-color: #fffdf6;
+  color: #382814;
+}
+.liff-theme :focus-visible {
+  outline: 3px solid #bb8a2f;
+  outline-offset: 2px;
 }

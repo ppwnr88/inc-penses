@@ -22,7 +22,7 @@
 | Scheduled jobs | Vercel Cron |
 | AI OCR | Gemini 2.5 Flash Lite |
 | Charts | Recharts |
-| Export | xlsx |
+| Export | ExcelJS |
 | Icons | lucide-react |
 
 ## Features

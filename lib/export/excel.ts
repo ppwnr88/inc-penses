@@ -15,7 +15,7 @@ export async function exportTransactionsToExcel(
   transactions: Transaction[],
   filename?: string
 ): Promise<void> {
-  const XLSX = await import('xlsx')
+  const ExcelJS = await import('exceljs')
 
   const headers = ['วันที่', 'ประเภท', 'หมวดหมู่', 'จำนวนเงิน (บาท)', 'หมายเหตุ', 'วิธีบันทึก']
 
@@ -44,21 +44,15 @@ export async function exportTransactionsToExcel(
     ['คงเหลือ', '', '', totalIncome - totalExpense, '', ''],
   ]
 
-  const worksheetData = [headers, ...rows, ...summaryRows]
-  const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
-
-  worksheet['!cols'] = [
-    { wch: 12 },
-    { wch: 10 },
-    { wch: 18 },
-    { wch: 16 },
-    { wch: 30 },
-    { wch: 14 },
-  ]
-
-  const workbook = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'รายการ')
-
-  const outputFilename = filename ?? `transactions_${new Date().toISOString().split('T')[0]}.xlsx`
-  XLSX.writeFile(workbook, outputFilename)
+  const workbook = new ExcelJS.Workbook()
+  const worksheet = workbook.addWorksheet('รายการ')
+  worksheet.addRows([headers, ...rows, ...summaryRows])
+  worksheet.columns = [12, 10, 18, 16, 30, 14].map(width => ({ width }))
+  const buffer = await workbook.xlsx.writeBuffer()
+  const url = URL.createObjectURL(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }))
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename ?? `transactions_${new Date().toISOString().split('T')[0]}.xlsx`
+  link.click()
+  URL.revokeObjectURL(url)
 }

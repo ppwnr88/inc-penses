@@ -10,8 +10,8 @@ interface HeaderProps {
 
 export function Header({ title, back, rightAction }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-gray-100">
-      <div className="flex items-center h-14 px-4 gap-3 max-w-lg mx-auto">
+    <header className="sticky top-0 z-30 bg-[#fff8e9]/95 backdrop-blur-md border-b-2 border-[#e7d8b8]">
+      <div className="flex items-center h-16 px-4 gap-3 max-w-lg mx-auto">
         {back && (
           <Link
             href={back}
@@ -20,8 +20,8 @@ export function Header({ title, back, rightAction }: HeaderProps) {
             <ChevronLeft size={20} />
           </Link>
         )}
-        <h1 className="flex-1 text-base font-semibold text-gray-800">{title}</h1>
-        {rightAction && <div>{rightAction}</div>}
+        <h1 className="flex-1 text-xl font-bold text-[#382814]">{title}</h1>
+        {rightAction ? <div>{rightAction}</div> : <img src="/images/wallet-mascot.webp" alt="" aria-hidden="true" className="h-12 w-12 object-contain" />}
       </div>
     </header>
   )

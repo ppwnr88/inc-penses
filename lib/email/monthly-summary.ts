@@ -147,7 +147,7 @@ export async function buildMonthlyEmailSummary(
 }
 
 export async function createMonthlySummaryExcel(summary: MonthlyEmailSummary): Promise<Buffer> {
-  const XLSX = await import('xlsx')
+  const ExcelJS = await import('exceljs')
 
   const summaryRows = [
     ['สรุปเดือน', summary.periodLabel],
@@ -174,28 +174,20 @@ export async function createMonthlySummaryExcel(summary: MonthlyEmailSummary): P
     tx.input_method,
   ])
 
-  const wb = XLSX.utils.book_new()
-
-  const summarySheet = XLSX.utils.aoa_to_sheet([
-    ['จด - สรุปรายรับรายจ่ายประจำเดือน'],
-    [],
-    ...summaryRows,
-    [],
-    ['ประเภท', 'หมวดหมู่', 'จำนวนรายการ', 'ยอดรวม', 'สัดส่วน'],
-    ...categoryRows,
+  const workbook = new ExcelJS.Workbook()
+  const summarySheet = workbook.addWorksheet('สรุป')
+  summarySheet.addRows([
+    ['จด - สรุปรายรับรายจ่ายประจำเดือน'], [], ...summaryRows, [],
+    ['ประเภท', 'หมวดหมู่', 'จำนวนรายการ', 'ยอดรวม', 'สัดส่วน'], ...categoryRows,
   ])
-  summarySheet['!cols'] = [{ wch: 18 }, { wch: 26 }, { wch: 14 }, { wch: 16 }, { wch: 12 }]
-
-  const transactionSheet = XLSX.utils.aoa_to_sheet([
+  summarySheet.columns = [18, 26, 14, 16, 12].map(width => ({ width }))
+  const transactionSheet = workbook.addWorksheet('รายการ')
+  transactionSheet.addRows([
     ['วันที่', 'ประเภท', 'หมวดหมู่', 'จำนวนเงิน (บาท)', 'หมายเหตุ', 'วิธีบันทึก'],
     ...transactionRows,
   ])
-  transactionSheet['!cols'] = [{ wch: 12 }, { wch: 10 }, { wch: 22 }, { wch: 16 }, { wch: 34 }, { wch: 14 }]
-
-  XLSX.utils.book_append_sheet(wb, summarySheet, 'สรุป')
-  XLSX.utils.book_append_sheet(wb, transactionSheet, 'รายการ')
-
-  return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
+  transactionSheet.columns = [12, 10, 22, 16, 34, 14].map(width => ({ width }))
+  return Buffer.from(await workbook.xlsx.writeBuffer())
 }
 
 export function buildMonthlySummaryEmailHtml(summary: MonthlyEmailSummary): string {

@@ -17,7 +17,7 @@ const PAGE_MAP: Record<string, string> = {
 }
 
 function PageRouter({ children }: { children: React.ReactNode }) {
-  const router = useSearchParams ? useSearchParams() : null
+  const router = useSearchParams()
   const routerNav = useRouter()
   const page = router?.get('page')
 
@@ -37,7 +37,7 @@ export default function LiffLayout({ children }: { children: React.ReactNode }) 
   return (
     <LiffProvider>
       <PreferencesProvider>
-        <div className="min-h-screen bg-cream-50 safe-area-pt">
+        <div className="liff-theme min-h-screen bg-cream-50 safe-area-pt">
           <React.Suspense fallback={null}>
             <PageRouter>{children}</PageRouter>
           </React.Suspense>

@@ -64,15 +64,16 @@ export default function DashboardPage() {
   return (
     <div className="page-container pt-4 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between pt-2">
+      <div className="relative flex items-center justify-between rounded-3xl border-2 border-[#d7dba9] bg-[#edf2d4] px-5 py-4 shadow-[0_4px_0_#d6dfb8]">
         <div>
           <p className="text-xs text-gray-400">{greeting}</p>
-          <h1 className="text-lg font-bold text-gray-900">
+          <h1 className="text-xl font-bold text-[#382814]">
             {profile?.display_name ?? t.dashboard.defaultUser} 👋
           </h1>
           <p className="text-xs text-gray-400">{monthDisplay}</p>
         </div>
         <div className="flex items-center gap-2">
+          <img src="/images/wallet-mascot.webp" alt="" aria-hidden="true" className="h-20 w-20 object-contain" />
           <Link
             href="/liff/settings"
             className="w-9 h-9 rounded-full overflow-hidden bg-brand-100 flex items-center justify-center"
@@ -152,7 +153,7 @@ export default function DashboardPage() {
       {/* FAB */}
       <button
         onClick={() => setShowForm(true)}
-        className="fixed bottom-20 right-4 w-14 h-14 bg-brand-500 hover:bg-brand-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all active:scale-95 z-30"
+        className="fixed bottom-20 right-4 w-14 h-14 bg-[#f7c94f] hover:bg-[#f2ba37] text-[#382814] border-2 border-[#6b5125] rounded-full shadow-[0_4px_0_#c79b34] flex items-center justify-center transition-all active:scale-95 z-30"
       >
         <Plus size={26} strokeWidth={2.5} />
       </button>

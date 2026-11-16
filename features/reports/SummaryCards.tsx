@@ -19,7 +19,7 @@ export function SummaryCards({ totalIncome, totalExpense, net, loading }: Summar
 
   if (loading) {
     return (
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="bg-white rounded-2xl p-3 space-y-2">
             <Skeleton className="h-3 w-12" />
@@ -31,8 +31,8 @@ export function SummaryCards({ totalIncome, totalExpense, net, loading }: Summar
   }
 
   return (
-    <div className="grid grid-cols-3 gap-3">
-      <Card padding="sm" className="flex flex-col gap-1">
+    <div className="grid grid-cols-2 gap-3">
+      <Card padding="sm" className="flex flex-col gap-1 bg-[#e4edc9]">
         <div className="flex items-center gap-1 text-green-600">
           <TrendingUp size={12} />
           <span className="text-xs font-medium">{t.common.income}</span>
@@ -42,7 +42,7 @@ export function SummaryCards({ totalIncome, totalExpense, net, loading }: Summar
         </p>
       </Card>
 
-      <Card padding="sm" className="flex flex-col gap-1">
+      <Card padding="sm" className="flex flex-col gap-1 bg-[#ffddcc]">
         <div className="flex items-center gap-1 text-red-500">
           <TrendingDown size={12} />
           <span className="text-xs font-medium">{t.common.expense}</span>
@@ -52,7 +52,7 @@ export function SummaryCards({ totalIncome, totalExpense, net, loading }: Summar
         </p>
       </Card>
 
-      <Card padding="sm" className="flex flex-col gap-1">
+      <Card padding="sm" className="flex flex-col gap-1 col-span-2 bg-[#ffe7a8]">
         <div className="flex items-center gap-1 text-brand-600">
           <Wallet size={12} />
           <span className="text-xs font-medium">{t.common.balance}</span>
