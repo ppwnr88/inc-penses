@@ -11,7 +11,8 @@ import {
 } from '@/lib/line/reply'
 import { createAdminClient } from '@/lib/supabase/server'
 import { DEFAULT_CATEGORIES } from '@/lib/utils/categories'
-import { readSlipWithGemini, downloadLineImage } from '@/lib/ai/gemini'
+import { downloadLineImage, readSlipWithGemini } from '@/lib/ai/gemini'
+import { readSlipWithOpenThai } from '@/lib/ai/openthai'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -109,6 +110,40 @@ async function handleTextMessage(event: LineTextEvent) {
   const userId = source.userId
   const text = message.text.trim()
 
+  const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean)
+  if (lines.length > 1) {
+    const results = lines.map(line => parseMessage(line))
+    if (results.some(result => result.isCommand)) {
+      await replyMessage(replyToken, [{ type: 'text', text: 'บางบรรทัดอ่านไม่ได้ กรุณาตรวจสอบแต่ละบรรทัดแล้วส่งใหม่ เช่น กินข้าว 100' }])
+      return
+    }
+    const transactions = results.filter(result => !result.isCommand)
+    const supabase = createAdminClient()
+    const profile = await getOrCreateProfile(supabase, userId)
+    if (!profile) {
+      await replyMessage(replyToken, [{ type: 'text', text: 'เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ 🙏' }])
+      return
+    }
+    const { data: categories, error: categoryError } = await supabase.from('categories').select('id, name').eq('profile_id', profile.id)
+    if (categoryError) {
+      await replyMessage(replyToken, [{ type: 'text', text: 'เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ 🙏' }])
+      return
+    }
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
+    const rows = transactions.map(tx => ({
+      profile_id: profile.id,
+      category_id: categories?.find(category => category.name === suggestCategory(tx.note, tx.type))?.id ?? null,
+      type: tx.type, amount: tx.amount, note: tx.note, date: tx.date ?? today, input_method: 'manual',
+    }))
+    const { error } = await supabase.from('transactions').insert(rows)
+    if (error) {
+      await replyMessage(replyToken, [{ type: 'text', text: 'บันทึกไม่สำเร็จ ลองใหม่อีกครั้งนะ 🙏' }])
+      return
+    }
+    const details = transactions.map(tx => `${tx.note} ${tx.amount.toLocaleString('th-TH')} บาท${tx.date ? ` (${tx.date})` : ''}`).join('\n')
+    await replyMessage(replyToken, [{ type: 'text', text: `บันทึก ${transactions.length} รายการแล้ว ✅\n${details}`.slice(0, 5000) }])
+    return
+  }
   const parsed = parseMessage(text)
 
   if (parsed.isCommand) {
@@ -200,7 +235,9 @@ async function handleImageMessage(event: LineImageEvent) {
 
   try {
     const { buffer: imageBuffer, mimeType } = await downloadLineImage(message.id)
-    const slip = await readSlipWithGemini(imageBuffer, mimeType)
+    const slip = process.env.IAPP_API_KEY
+      ? await readSlipWithOpenThai(imageBuffer, mimeType)
+      : await readSlipWithGemini(imageBuffer, mimeType)
 
     if (!slip) {
       await replyMessage(replyToken, [{
